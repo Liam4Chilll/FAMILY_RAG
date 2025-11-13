@@ -2,7 +2,10 @@
 
 # 📚 FAMILY RAG
 
-### *La mémoire vivante de votre famille, accessible par l'IA sans connexion internet*
+### *La mémoire vivante de votre famille*
+
+*Interrogez en langage naturel l'histoire, les recettes, les documents administratifs et les cours de votre famille accessible par l'IA et surtout SANS CONNEXION INTERNET !*
+
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.14+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -12,8 +15,6 @@
 [![FAISS](https://img.shields.io/badge/FAISS-GPU-4285F4?logo=meta&logoColor=white)](https://github.com/facebookresearch/faiss)
 [![Fedora](https://img.shields.io/badge/Fedora-43-51A2DA?logo=fedora&logoColor=white)](https://getfedora.org/)
 [![macOS](https://img.shields.io/badge/macOS-Compatible-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
-
-*Interrogez en langage naturel l'histoire, les recettes, les documents administratifs et les cours de votre famille*
 
 </div>
 
@@ -249,7 +250,6 @@ rag-manage backup
 Les contributions sont les bienvenues ! Ce projet est né d'un **besoin personnel** de transmission intergénérationnelle et d'efficacité quotidienne.
 
 - 🐛 **Bugs** : [Ouvrir une issue](https://github.com/liam4chilll/FAMILY_RAG/issues)
-- 💡 **Idées** : [Démarrer une discussion](https://github.com/liam4chilll/FAMILY_RAG/discussions)
 - 🔧 **Code** : Fork → Branch → PR
 
 [Lire la licence complète →](LICENSE)
@@ -258,9 +258,7 @@ Les contributions sont les bienvenues ! Ce projet est né d'un **besoin personne
 
 ---
 
-## 🙏 Remerciements
-
-Construit avec des technologies open-source d'exception :
+J'ai conçu Family RAG avec des technologies open-source :
 
 <div align="center">
 
@@ -272,26 +270,13 @@ Construit avec des technologies open-source d'exception :
 
 </div>
 
-Merci à la communauté open-source qui rend ce type de projet possible ! 🌟
+Merci à la communauté open-source qui rend ce type de projet possible !
 
----
+ Si ce projet résonne avec vous, donnez-lui une étoile ⭐ !
 
-<div align="center">
-
-### ⭐ Si ce projet résonne avec vous, donnez-lui une étoile !
-
-**Fait avec ❤️ pour préserver et transmettre la mémoire familiale**
-
----
-
-*"La mémoire est le parfum de l'âme." — George Sand*
-
----
+**Family RAG est fait avec ❤️ pour préserver et transmettre la mémoire familiale de chacun**
 
 [⬆ Retour en haut](#-FAMILY_RAG)
-
-</div>
-```
 
 ---
 
