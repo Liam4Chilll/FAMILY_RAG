@@ -147,16 +147,6 @@ Tout est automatisé. Exécutez simplement les scripts dans l'ordre :
 
 **Durée totale : ~35 minutes** ⏱️
 
-### Ce que fait chaque script
-
-| Script | Fonction |
-|--------|----------|
-| `setup_network_mac.sh` | Configure l'interface réseau virtuelle (VMware/VirtualBox) |
-| `setup_vm_fedora.sh` | Crée automatiquement la VM avec l'ISO Fedora |
-| `setup_ssh.sh` | Génère et échange les clés SSH Mac ↔ VM |
-| `setup_ollama.sh` | Installe Ollama, télécharge Mistral + Nomic, configure LaunchAgent |
-| `setup_rag.sh` | Déploie Python, Langchain, FAISS, parsers et script RAG |
-
 **Prérequis** : Mac (M1/M2/M3 ou Intel), VMware Fusion/VirtualBox, ISO Fedora 43
 
 ---
