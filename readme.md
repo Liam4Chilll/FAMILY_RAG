@@ -111,7 +111,7 @@ Accès à la webUI : http://<VM_IP>:5000
 ./cleanup-macos.sh
 
 # Machine virtuelle
-./cleanup-vm.
+./cleanup-vm
 
 
 ## 🛡️ Sécurité & Confidentialité
@@ -163,5 +163,3 @@ Merci à la communauté open-source qui rend ce type de projet possible !
  Si ce projet résonne avec vous, donnez-lui une étoile ⭐ !
 
 **Family RAG est fait avec ❤️ pour préserver et transmettre la mémoire familiale de chacun**
-
-[⬆ Retour en haut](#-FAMILY_RAG)
