@@ -111,7 +111,7 @@ Accès à la webUI : http://<VM_IP>:5000
 ./cleanup-macos.sh
 
 # Machine virtuelle
-./cleanup-vm
+./cleanup-vm.sh
 
 
 ## 🛡️ Sécurité & Confidentialité
