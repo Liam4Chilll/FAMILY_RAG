@@ -22,31 +22,28 @@
 
 ## 🎯 Pourquoi Family RAG ?
 
-### Le problème
-
 Chaque famille accumule au fil des années une **richesse documentaire** considérable :
+
+
 - 📜 **Documents administratifs** : actes, contrats, factures, garanties
 - 👨‍👩‍👧‍👦 **Histoire familiale** : lettres, biographies, photos légendées, arbres généalogiques
 - 🍳 **Savoir-faire** : recettes de grand-mère, techniques artisanales, tours de main
 - 📚 **Éducation** : cours des enfants, notes de révision, fiches méthodes
 - 🏡 **Patrimoine** : plans, diagnostics, travaux, entretien maison
 
-Cette **mémoire familiale** est souvent :
-- ❌ Dispersée dans des tiroirs, classeurs, ordinateurs
-- ❌ Inaccessible sans fouiller pendant des heures
-- ❌ Perdue à la disparition de celui qui "savait où c'était"
-- ❌ Non transmise aux générations futures
 
-### La solution : FAMILY RAG
 
-Un système **intelligent et privé** qui :
+Aujourd'hui je propose un système facilement déployable, **intelligent et privé** qui :
+
 - ✅ **Centralise** tous vos documents en un seul endroit
 - ✅ **Comprend** le sens de vos questions en langage naturel
 - ✅ **Répond** en s'appuyant sur vos propres archives
 - ✅ **Préserve** la mémoire familiale vectorisée pour les générations futures
 - ✅ **Reste local** : aucune donnée ne quitte votre infrastructure
 
-### Cas d'usage concrets
+
+
+### Voici quelques cas d'usage concrets
 
 **📋 Administratif**
 > *"Où est la garantie du lave-vaisselle acheté en 2019 ?"*
@@ -67,30 +64,6 @@ Un système **intelligent et privé** qui :
 > *"Explique-moi la règle des participes passés vue en CM2"*
 > 
 > *"Résume le cours de SVT sur la photosynthèse"*
-
----
-
-## 🏗️ Architecture
-
-### Vue d'ensemble
-```
-┌────────────────────────────────────────────────────┐
-│              ARCHITECTURE HYBRIDE                   │
-│                                                     │
-│  ╔══════════════════════╗     ╔═══════════════════╗│
-│  ║   Mac M3 Pro (Hôte)  ║────▶║  VM Fedora 43     ║│
-│  ╠══════════════════════╣     ╠═══════════════════╣│
-│  ║  🤖 Ollama           ║     ║  🐍 Python RAG    ║│
-│  ║  • Mistral LLM       ║     ║  • Langchain      ║│
-│  ║  • Nomic Embeddings  ║     ║  • FAISS VectorDB ║│
-│  ║                      ║     ║  • Flask WebUI    ║│
-│  ║  📁 Documents RAG    ║◀────║  📂 SSHFS Mount   ║│
-│  ║     ~/Documents/RAG  ║     ║     ~/RAG         ║│
-│  ╚══════════════════════╝     ╚═══════════════════╝│
-│                                                     │
-│  Réseau privé : 172.16.74.0/24 (offline-ready)    │
-└────────────────────────────────────────────────────┘
-```
 
 ### Stack technologique
 
@@ -122,97 +95,24 @@ graph LR
 
 ---
 
-## ⚡ Installation en 5 scripts
+## ⚡ Installation en 2 scripts
 
-Tout est automatisé. Exécutez simplement les scripts dans l'ordre :
-```bash
-# 1️⃣ Réseau privé Mac ↔ VM
-./installation-reseau.sh
+# Machine hôte (IA + modèles)
+./setup-macos.sh
 
-# 2️⃣ Création VM Fedora 43
-./installation_fedora.sh
+# Machine virtuelle (RAG)
+./setup-rag-vm.sh
 
-# 3️⃣ Configuration SSH bidirectionnelle
-./configuration_ssh.sh
+Accès à la webUI : http://<VM_IP>:5000
 
-# 4️⃣ Installation Ollama + modèles sur Mac
-./installation_ollama.sh
+## 🧹 Désinstallation
 
-# 5️⃣ Déploiement RAG complet sur VM
-./installation_rag.sh
+# Machine hôte
+./cleanup-macos.sh
 
-# 🎁 Manager les services du RAG au complet depuis la machine hôte : 
-./rag_manager.sh
-```
+# Machine virtuelle
+./cleanup-vm.
 
-**Durée totale : ~35 minutes** ⏱️
-
-**Prérequis** : Mac (M1/M2/M3 ou Intel), VMware Fusion/VirtualBox, ISO Fedora 43
-
----
-
-## 🚀 Utilisation
-
-### Interface web (recommandée)
-```bash
-# Sur la VM
-python ~/rag_webui.py
-
-# Accéder à : http://VM_IP:5000
-```
-
-**Fonctionnalités** :
-- 💬 Chat en temps réel avec l'assistant familial
-- 📊 Métriques système (documents, chunks, requêtes)
-- 📜 Historique complet avec export JSON
-- ⚙️ Configuration avancée (modèles, température, k)
-- 🔄 Indexation visuelle avec progression
-
-### Ligne de commande
-```bash
-# Sur la VM
-source ~/rag_env/bin/activate
-
-# Indexer les documents
-rag index
-
-# Interroger
-rag query "Ta question ici"
-```
-
-### Gestionnaire système
-```bash
-# Installer
-sudo cp rag_manager.sh /usr/local/bin/rag-manage
-
-# Démarrer tout
-rag-manage start
-
-# Statut complet avec diagnostics
-rag-manage status
-
-# Arrêter proprement
-rag-manage stop
-
-# Sauvegarder la base vectorielle
-rag-manage backup
-```
-
----
-
-## 📦 Formats supportés
-
-| Format | Extension | Cas d'usage |
-|--------|-----------|-------------|
-| Texte | `.txt` `.md` | Notes, transcriptions |
-| PDF | `.pdf` | Scans, documents officiels |
-| Word | `.docx` | Lettres, biographies |
-| LibreOffice | `.odt` | Documents alternatifs |
-| Web | `.html` `.htm` | Archives pages web |
-| Email | `.eml` | Correspondances |
-| Ebook | `.epub` | Livres numériques |
-
----
 
 ## 🛡️ Sécurité & Confidentialité
 
@@ -226,12 +126,10 @@ rag-manage backup
 
 ## 🗺️ Roadmap
 
-- [ ] Support OCR pour documents scannés (Tesseract)
-- [ ] Transcription audio des interviews familiales (Whisper)
-- [ ] Timeline interactive des événements
+- [ ] Interropérabilité Windows
+- [ ] Prise en charge des formats JPEG, PNG, MP3, MP4
 - [ ] Export PDF des conversations
-- [ ] Mode multi-utilisateurs
-- [ ] Application mobile
+- [ ] Au fil de l'eau..
 
 ---
 
