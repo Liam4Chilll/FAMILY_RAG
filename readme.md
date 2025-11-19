@@ -147,9 +147,6 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 
 #### 1️⃣ Setup Windows (Host Ollama)
 ```powershell
-# Télécharger le script
-Invoke-WebRequest -Uri "https://github.com/liam4chilll/FAMILY_RAG/releases/download/v1.1.0/install-llm-windows.ps1" -OutFile "install-llm-windows.ps1"
-
 # Exécuter avec droits admin
 .\install-llm-windows.ps1
 ```
@@ -158,9 +155,6 @@ Invoke-WebRequest -Uri "https://github.com/liam4chilll/FAMILY_RAG/releases/downl
 
 #### 2️⃣ Setup Linux (Client RAG)
 ```bash
-# Télécharger le script
-curl -LO https://github.com/liam4chilll/FAMILY_RAG/releases/download/v1.1.0/install-rag-fedora.sh
-
 # Rendre exécutable et lancer
 chmod +x install-rag-fedora.sh
 ./install-rag-fedora.sh
@@ -174,9 +168,6 @@ chmod +x install-rag-fedora.sh
 
 #### 1️⃣ Setup macOS (Host Ollama)
 ```bash
-# Télécharger le script
-curl -LO https://github.com/liam4chilll/FAMILY_RAG/releases/download/v1.0.0/install-llm-macos.sh
-
 # Rendre exécutable et lancer
 chmod +x install-llm-macos.sh
 ./install-llm-macos.sh
@@ -184,9 +175,6 @@ chmod +x install-llm-macos.sh
 
 #### 2️⃣ Setup Linux (Client RAG)
 ```bash
-# Télécharger le script
-curl -LO https://github.com/liam4chilll/FAMILY_RAG/releases/download/v1.0.0/setup-rag-vm.sh
-
 # Rendre exécutable et lancer
 chmod +x setup-rag-vm.sh
 ./setup-rag-vm.sh
