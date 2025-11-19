@@ -7,7 +7,6 @@
 *Interrogez en langage naturel l'histoire, les recettes, les documents administratifs et les cours de votre famille accessible par l'IA et surtout SANS CONNEXION INTERNET !*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Release](https://img.shields.io/github/v/release/liam4chilll/FAMILY_RAG?color=blue)](https://github.com/liam4chilll/FAMILY_RAG/releases)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Ollama](https://img.shields.io/badge/Ollama-Latest-FF6B6B)](https://ollama.ai/)
 [![Langchain](https://img.shields.io/badge/🦜_Langchain-Latest-00A67E)](https://langchain.com/)
@@ -94,10 +93,10 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 
 <div align="center">
 
-| Version | Plateforme Ollama | Client RAG | Partage | Status |
-|---------|-------------------|------------|---------|--------|
-| [**v1.1.0**](https://github.com/liam4chilll/FAMILY_RAG/releases/tag/v1.1.0) | **Windows 11 ARM** | Linux (Fedora/Ubuntu) | **SMB** | ✅ Stable |
-| [**v1.0.0**](https://github.com/liam4chilll/FAMILY_RAG/releases/tag/v1.0.0) | **macOS** (M1/M2/M3) | Linux (Fedora) | **SSHFS** | ✅ Stable |
+| OS | Client RAG | Partage | Status |
+|---------|------------|---------|--------|
+| **Windows 11 (ARM)** | Linux (Fedora/Ubuntu) | **SMB** | ✅ Stable |
+| **AppleSilicon** (M1/M2/M3) | Linux (Fedora) | **SSHFS** | ✅ Stable |
 
 </div>
 
@@ -118,7 +117,7 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 - ✅ Configuration pare-feu automatique
 - ✅ Interface graphique complète
 
-[📥 Télécharger v1.1.0 →](https://github.com/liam4chilll/FAMILY_RAG/releases/tag/v1.1.0)
+[📥 Windows 11 (ARM)](https://github.com/Liam4Chilll/FAMILY_RAG/tree/main/WINDOWS_11_ARM) 
 
 </td>
 <td width="50%" align="center">
@@ -134,7 +133,7 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 - ✅ Montage SSHFS léger
 - ✅ Intégration macOS fluide
 
-[📥 Télécharger v1.0.0 →](https://github.com/liam4chilll/FAMILY_RAG/releases/tag/v1.0.0)
+[📥 AppleSilicon](https://github.com/Liam4Chilll/FAMILY_RAG/tree/main/APPLE_SILLICON) M1,M2,M3,M4
 
 </td>
 </tr>
@@ -221,8 +220,6 @@ python ~/rag_webui.py
 ```
 
 <div align="center">
-
-![WebUI Preview](https://via.placeholder.com/800x400/667eea/ffffff?text=Family+RAG+WebUI)
 
 *Interface web responsive accessible depuis tout appareil du réseau local*
 
