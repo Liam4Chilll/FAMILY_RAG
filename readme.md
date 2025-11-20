@@ -120,11 +120,26 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 [📥 Windows 11 (ARM)](https://github.com/Liam4Chilll/FAMILY_RAG/tree/main/WINDOWS_11_ARM) 
 
 </td>
+
+<td width="50%" align="center">
+    
+### 🍎 Windows 11 x86-x64
+**Recommandé pour :**
+- Utilisateurs Windows 32bits & 64bit
+
+**Avantages :**
+- ✅ Accessible pour la majorité des systèmes actuels
+- ✅ Partage SMB natif
+
+[📥 Windows 10/11 - COMING SOON]()
+
+</td>
+
 <td width="50%" align="center">
 
-### 🍎 macOS (Apple Silicon)
+### 🍎 MacOS (Apple Silicon)
 **Recommandé pour :**
-- Utilisateurs Mac M1/M2/M3
+- Utilisateurs Mac M1/M2/M3/M4
 - Performance optimale Apple Silicon
 - Workflow macOS natif
 
