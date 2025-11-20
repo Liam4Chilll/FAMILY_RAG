@@ -95,7 +95,7 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 
 | OS | Client RAG | Partage | Status |
 |---------|------------|---------|--------|
-| **Windows 11 (ARM)** | Linux (Fedora/Ubuntu) | **SMB** | ✅ Stable |
+| **Windows 11** | Linux (Fedora/Ubuntu) | **SMB** | ✅ Stable |
 | **AppleSilicon** (M1/M2/M3) | Linux (Fedora) | **SSHFS** | ✅ Stable |
 
 </div>
@@ -117,21 +117,11 @@ Chaque famille accumule au fil des années une **richesse documentaire** consid�
 - ✅ Configuration pare-feu automatique
 - ✅ Interface graphique complète
 
-[📥 Windows 11 (ARM)](https://github.com/Liam4Chilll/FAMILY_RAG/tree/main/WINDOWS_11_ARM) 
+[📥 Windows 11 (ARM)](https://github.com/Liam4Chilll/FAMILY_RAG/tree/main/WINDOWS_11_ARM)
 
-</td>
+---
 
-<td width="50%" align="center">
-    
-### 🍎 Windows 11 x86-x64
-**Recommandé pour :**
-- Utilisateurs Windows 32bits & 64bit
-
-**Avantages :**
-- ✅ Accessible pour la majorité des systèmes actuels
-- ✅ Partage SMB natif
-
-[📥 Windows 10/11 - COMING SOON]()
+[📥 Windows 11 (64 bits) - COMING SOON]()
 
 </td>
 
