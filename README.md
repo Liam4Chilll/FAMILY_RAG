@@ -1,138 +1,193 @@
-# RAG Local - Docker + Ollama
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/Docker-24.0-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Ollama-LLM-000000?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama"/>
+</p>
 
-Système RAG (Retrieval-Augmented Generation) local et privé, conçu pour fonctionner avec Ollama sur macOS (Apple Silicon).
+<p align="center">
+  <img src="https://img.shields.io/badge/LangChain-0.3-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" alt="LangChain"/>
+  <img src="https://img.shields.io/badge/FAISS-Vector_DB-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="FAISS"/>
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind"/>
+  <img src="https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=white" alt="Alpine.js"/>
+</p>
 
-## Architecture
+<p align="center">
+  <img src="https://img.shields.io/badge/Apple_Silicon-M1%2FM2%2FM3-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Apple Silicon"/>
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License"/>
+</p>
+
+---
+
+<h1 align="center">📚 FamilyRAG</h1>
+
+<h3 align="center">
+  <em>Votre bibliothèque interactive intergénérationnelle, 100% locale</em>
+</h3>
+
+<p align="center">
+  Posez des questions à vos documents en langage naturel.<br/>
+  Sans cloud. Sans abonnement. Sans compromis sur la vie privée.
+</p>
+
+---
+
+## 🏠 Qu'est-ce que FamilyRAG ?
+
+**FamilyRAG** est un système RAG (Retrieval-Augmented Generation) entièrement local, conçu pour les familles qui souhaitent exploiter la puissance de l'IA générative tout en gardant le contrôle total sur leurs données.
+
+Imaginez pouvoir interroger en langage naturel :
+- 📄 Les documents administratifs de la famille
+- 📖 Les recettes de grand-mère numérisées
+- 📝 Les cours et devoirs des enfants
+- 📧 Les archives emails importantes
+- 📚 Votre bibliothèque personnelle de livres et articles
+
+**Le tout sans qu'une seule donnée ne quitte votre domicile.**
+
+---
+
+## ✨ Pourquoi FamilyRAG ?
+
+<table>
+<tr>
+<td width="50%">
+
+### 🔒 Souveraineté totale
+Vos documents restent sur **votre** machine. Aucun serveur distant, aucun cloud, aucune fuite de données possible.
+
+### 🌐 100% Hors-ligne
+Une fois installé, FamilyRAG fonctionne **sans connexion internet**. Idéal pour les zones rurales ou les familles soucieuses de leur empreinte numérique.
+
+</td>
+<td width="50%">
+
+### 👨‍👩‍👧‍👦 Intergénérationnel
+Une interface simple et intuitive, accessible aux grands-parents comme aux adolescents. Posez vos questions naturellement, obtenez des réponses claires.
+
+### ⚡ Performant
+Optimisé pour Apple Silicon (M1/M2/M3), FamilyRAG exploite la puissance de votre Mac pour des réponses rapides et pertinentes.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    MacBook M3 Pro                       │
-│  ┌───────────────┐      ┌────────────────────────────┐  │
-│  │    Ollama     │◄────►│      Docker Container      │  │
-│  │  (natif Mac)  │ API  │  ┌──────────────────────┐  │  │
-│  │               │      │  │  FastAPI + FAISS     │  │  │
-│  │ - mistral     │      │  │  + LangChain         │  │  │
-│  │ - nomic-embed │      │  └──────────────────────┘  │  │
-│  └───────────────┘      │  ┌──────────────────────┐  │  │
-│                         │  │  WebUI (Tailwind)    │  │  │
-│  ┌───────────────┐      │  └──────────────────────┘  │  │
-│  │  Dossier RAG/ │◄────►│         /data             │  │
-│  │   (local)     │mount │                            │  │
-│  └───────────────┘      └────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      MacBook (Apple Silicon)                │
+│                                                             │
+│  ┌─────────────────┐        ┌────────────────────────────┐  │
+│  │     Ollama      │◄──────►│     Docker Container       │  │
+│  │   (natif Mac)   │  API   │                            │  │
+│  │                 │        │  ┌──────────────────────┐  │  │
+│  │ • mistral       │        │  │  FastAPI + FAISS     │  │  │
+│  │ • nomic-embed   │        │  │  + LangChain         │  │  │
+│  │                 │        │  └──────────────────────┘  │  │
+│  └─────────────────┘        │                            │  │
+│          │                  │  ┌──────────────────────┐  │  │
+│          │ GPU              │  │  WebUI               │  │  │
+│          ▼                  │  │  Tailwind + Alpine   │  │  │
+│  ┌─────────────────┐        │  └──────────────────────┘  │  │
+│  │  Apple Silicon  │        │                            │  │
+│  │   M1/M2/M3      │        │        localhost:8000      │  │
+│  └─────────────────┘        └────────────────────────────┘  │
+│                                        ▲                    │
+│  ┌─────────────────┐                   │                    │
+│  │  📁 Vos Docs    │───────────────────┘                    │
+│  │  (RAG folder)   │  volume mount                          │
+│  └─────────────────┘                                        │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## Prérequis
+---
+
+## 🚀 Installation
+
+### Prérequis
 
 - macOS avec Apple Silicon (M1/M2/M3)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé
-- [Ollama](https://ollama.ai/) installé et fonctionnel
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Ollama](https://ollama.ai/)
 
-## Installation rapide
-
-### 1. Installer Ollama et les modèles
+### Étape 1 — Préparer Ollama
 
 ```bash
-# Installer Ollama (si pas déjà fait)
+# Installer Ollama
 brew install ollama
 
-# Démarrer Ollama
+# Démarrer le service
 ollama serve
+```
 
-# Dans un autre terminal, télécharger les modèles
+Dans un autre terminal :
+
+```bash
+# Télécharger les modèles
 ollama pull mistral:latest
 ollama pull nomic-embed-text
 ```
 
-### 2. Cloner et lancer le projet
+### Étape 2 — Cloner FamilyRAG
 
 ```bash
-git clone https://github.com/votre-username/rag-local-docker.git
-cd rag-local-docker
-
-# Créer le dossier pour vos documents
-mkdir -p RAG
-
-# Lancer le conteneur
-docker-compose up -d
+git clone https://github.com/Liam4Chilll/FamilyRAG.git
+cd FamilyRAG
 ```
 
-### 3. Accéder à l'interface
+### Étape 3 — Configurer le dossier documents
 
-Ouvrir http://localhost:8000 dans votre navigateur.
+Éditez `docker-compose.yml` et indiquez le chemin vers vos documents :
 
-## Utilisation
-
-### Ajouter des documents
-
-Placez vos fichiers dans le dossier `RAG/` :
-- PDF, TXT, MD, DOCX, EML supportés
-- Les documents sont automatiquement détectés
-
-### Interface web
-
-1. **Onglet Documents** : Voir les fichiers disponibles, lancer l'indexation
-2. **Onglet Chat** : Poser des questions sur vos documents
-3. **Paramètres** : Ajuster le nombre de résultats, la température du LLM
-
-## Configuration
-
-Variables d'environnement (modifiables dans `docker-compose.yml`) :
-
-| Variable | Défaut | Description |
-|----------|--------|-------------|
-| `OLLAMA_HOST` | `host.docker.internal:11434` | Adresse de l'API Ollama |
-| `EMBEDDING_MODEL` | `nomic-embed-text` | Modèle d'embedding |
-| `LLM_MODEL` | `mistral:latest` | Modèle de génération |
-| `CHUNK_SIZE` | `1000` | Taille des chunks de texte |
-| `CHUNK_OVERLAP` | `200` | Chevauchement entre chunks |
-
-## Structure du projet
-
-```
-rag-local-docker/
-├── docker-compose.yml    # Configuration Docker
-├── Dockerfile            # Image du conteneur
-├── README.md             # Cette documentation
-├── RAG/                  # Vos documents (à créer)
-└── app/
-    ├── main.py           # API FastAPI
-    ├── rag_engine.py     # Logique RAG (FAISS + LangChain)
-    ├── document_loader.py # Chargement des documents
-    ├── requirements.txt  # Dépendances Python
-    ├── static/
-    │   └── style.css     # Styles additionnels
-    └── templates/
-        └── index.html    # Interface web
+```yaml
+volumes:
+  - /Users/votre-username/RAG:/data    # ← Votre dossier
+  - rag-index:/app/index
 ```
 
-## Commandes utiles
+### Étape 4 — Lancer FamilyRAG
 
 ```bash
-# Voir les logs
-docker-compose logs -f
-
-# Redémarrer le conteneur
-docker-compose restart
-
-# Arrêter
-docker-compose down
-
-# Reconstruire après modification
 docker-compose up -d --build
 ```
 
-## Dépannage
+### Étape 5 — C'est prêt !
 
-### Ollama non accessible
-Vérifiez que Ollama tourne : `curl http://localhost:11434/api/tags`
+Ouvrez **http://localhost:8000** et commencez à interroger vos documents. 🎉
 
-### Erreur de mémoire
-Réduisez `CHUNK_SIZE` dans `docker-compose.yml`
+---
 
-### Documents non détectés
-Vérifiez les permissions du dossier `RAG/`
+## 📂 Formats supportés
 
-## Licence
+<p align="center">
+  <img src="https://img.shields.io/badge/PDF-Documents-EC1C24?style=for-the-badge&logo=adobe-acrobat-reader&logoColor=white" alt="PDF"/>
+  <img src="https://img.shields.io/badge/TXT-Texte-4A4A4A?style=for-the-badge&logo=textpattern&logoColor=white" alt="TXT"/>
+  <img src="https://img.shields.io/badge/MD-Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white" alt="MD"/>
+  <img src="https://img.shields.io/badge/DOCX-Word-2B579A?style=for-the-badge&logo=microsoft-word&logoColor=white" alt="DOCX"/>
+  <img src="https://img.shields.io/badge/EML-Email-005FF9?style=for-the-badge&logo=mail.ru&logoColor=white" alt="EML"/>
+</p>
 
-MIT
+---
+
+## 📖 Documentation
+
+Pour l'administration, la configuration avancée et le dépannage, consultez le **[Guide d'Administration](MANAGE.md)**.
+
+---
+
+## 📜 Licence
+
+Ce projet est distribué sous licence **MIT**. Utilisez-le, modifiez-le, partagez-le librement.
+
+---
+
+<p align="center">
+  <strong>Construit avec ❤️ par <a href="https://github.com/Liam4Chilll">Liam4Chilll</a></strong>
+</p>
+
+<p align="center">
+  <em>FamilyRAG — Parce que vos données familiales méritent de rester en famille.</em>
+</p>
