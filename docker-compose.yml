@@ -1,0 +1,25 @@
+services:
+  rag:
+    build: .
+    container_name: rag-local
+    ports:
+      - "8000:8000"
+    volumes:
+      #- <RENSEIGNER LE CHEMIN VERS LE DOSSIER RAG>:/data
+      - rag-index:/app/index
+    environment:
+      - OLLAMA_HOST=host.docker.internal:11434
+      - EMBEDDING_MODEL=nomic-embed-text
+      - LLM_MODEL=mistral:latest
+      - CHUNK_SIZE=1000
+      - CHUNK_OVERLAP=200
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  rag-index:
+    name: rag-local-index

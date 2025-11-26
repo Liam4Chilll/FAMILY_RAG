@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Local</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div x-data="ragApp()" x-init="init()" class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">RAG Local</h1>
+                    <p class="text-gray-400 mt-1">Interrogez vos documents avec l'IA</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3">
+                            <span :class="ollamaConnected ? 'bg-green-400' : 'bg-red-400'" 
+                                  class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                            <span :class="ollamaConnected ? 'bg-green-500' : 'bg-red-500'" 
+                                  class="relative inline-flex rounded-full h-3 w-3"></span>
+                        </span>
+                        <span class="text-sm text-gray-400" x-text="ollamaConnected ? 'Ollama connecté' : 'Ollama déconnecté'"></span>
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="flex gap-1 mb-6 bg-gray-800 p-1 rounded-lg w-fit">
+            <button @click="activeTab = 'chat'" 
+                    :class="activeTab === 'chat' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'"
+                    class="px-4 py-2 rounded-md transition-colors font-medium">
+                💬 Chat
+            </button>
+            <button @click="activeTab = 'documents'" 
+                    :class="activeTab === 'documents' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'"
+                    class="px-4 py-2 rounded-md transition-colors font-medium">
+                📁 Documents
+            </button>
+            <button @click="activeTab = 'settings'" 
+                    :class="activeTab === 'settings' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'"
+                    class="px-4 py-2 rounded-md transition-colors font-medium">
+                ⚙️ Paramètres
+            </button>
+        </nav>
+
+        <!-- Chat Tab -->
+        <div x-show="activeTab === 'chat'" x-cloak>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Zone de chat -->
+                <div class="lg:col-span-2 bg-gray-800 rounded-xl p-6">
+                    
+                    <!-- Messages -->
+                    <div class="h-96 overflow-y-auto mb-4 space-y-4" id="chat-messages">
+                        <template x-for="(msg, index) in messages" :key="index">
+                            <div :class="msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                                <div :class="msg.type === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'"
+                                     class="max-w-[80%] rounded-2xl px-4 py-3">
+                                    <p class="whitespace-pre-wrap" x-text="msg.content"></p>
+                                    
+                                    <!-- Métriques pour les réponses -->
+                                    <template x-if="msg.metrics">
+                                        <div class="mt-2 pt-2 border-t border-gray-600 text-xs text-gray-400 flex gap-4">
+                                            <span>⏱️ <span x-text="msg.metrics.query_time_ms"></span>ms</span>
+                                            <span>📄 <span x-text="msg.metrics.chunks_found"></span> chunks</span>
+                                            <span>🤖 <span x-text="msg.metrics.model"></span></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <!-- Indicateur de chargement -->
+                        <div x-show="loading" class="flex justify-start">
+                            <div class="bg-gray-700 rounded-2xl px-4 py-3">
+                                <div class="flex gap-1">
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Message initial -->
+                        <div x-show="messages.length === 0 && !loading" class="text-center text-gray-500 py-16">
+                            <p class="text-4xl mb-4">💬</p>
+                            <p>Posez une question sur vos documents</p>
+                            <p class="text-sm mt-2" x-show="!stats.index.exists">
+                                ⚠️ Indexez d'abord vos documents dans l'onglet Documents
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Input -->
+                    <form @submit.prevent="sendQuery()" class="flex gap-3">
+                        <input type="text" 
+                               x-model="query" 
+                               placeholder="Posez votre question..."
+                               :disabled="loading || !stats.index.exists"
+                               class="flex-1 bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 disabled:opacity-50">
+                        <button type="submit" 
+                                :disabled="loading || !query.trim() || !stats.index.exists"
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-6 py-3 rounded-xl font-medium transition-colors">
+                            Envoyer
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Sources -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h3 class="font-semibold mb-4 text-lg">📚 Sources</h3>
+                    
+                    <div x-show="currentSources.length === 0" class="text-gray-500 text-sm">
+                        Les sources apparaîtront ici après une requête
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <template x-for="(source, index) in currentSources" :key="index">
+                            <div class="bg-gray-700 rounded-lg p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-sm truncate" x-text="source.source"></span>
+                                    <span class="text-xs bg-blue-600 px-2 py-0.5 rounded-full" 
+                                          x-text="(source.score * 100).toFixed(1) + '%'"></span>
+                                </div>
+                                <p class="text-xs text-gray-400 line-clamp-3" x-text="source.preview"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Tab -->
+        <div x-show="activeTab === 'documents'" x-cloak>
+            <div class="bg-gray-800 rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold">Documents disponibles</h2>
+                        <p class="text-gray-400 text-sm mt-1">Placez vos fichiers dans le dossier RAG/</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button @click="refreshFiles()" 
+                                :disabled="indexing"
+                                class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
+                            🔄 Rafraîchir
+                        </button>
+                        <button @click="indexDocuments()" 
+                                :disabled="indexing || files.length === 0"
+                                class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg font-medium transition-colors">
+                            <span x-show="!indexing">📥 Indexer les documents</span>
+                            <span x-show="indexing" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Indexation...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stats index -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-700 rounded-lg p-4 text-center">
+                        <p class="text-2xl font-bold" x-text="files.length">0</p>
+                        <p class="text-sm text-gray-400">Fichiers détectés</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4 text-center">
+                        <p class="text-2xl font-bold" x-text="stats.index.total_chunks">0</p>
+                        <p class="text-sm text-gray-400">Chunks indexés</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4 text-center">
+                        <p class="text-2xl font-bold" x-text="stats.index.exists ? '✓' : '✗'"></p>
+                        <p class="text-sm text-gray-400">Index actif</p>
+                    </div>
+                </div>
+                
+                <!-- Notification -->
+                <div x-show="indexResult" x-transition 
+                     :class="indexResult?.success ? 'bg-green-900/50 border-green-700' : 'bg-red-900/50 border-red-700'"
+                     class="border rounded-lg p-4 mb-6">
+                    <template x-if="indexResult?.success">
+                        <p>✅ Indexation terminée : <span x-text="indexResult.documents"></span> documents, 
+                           <span x-text="indexResult.chunks"></span> chunks en <span x-text="indexResult.time_seconds"></span>s</p>
+                    </template>
+                    <template x-if="indexResult && !indexResult.success">
+                        <p>❌ Erreur : <span x-text="indexResult.error"></span></p>
+                    </template>
+                </div>
+                
+                <!-- Liste des fichiers -->
+                <div class="space-y-2">
+                    <template x-for="file in files" :key="file.path">
+                        <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl" x-text="getFileIcon(file.type)"></span>
+                                <span x-text="file.name"></span>
+                            </div>
+                            <span class="text-sm text-gray-400" x-text="formatSize(file.size)"></span>
+                        </div>
+                    </template>
+                    
+                    <div x-show="files.length === 0" class="text-center text-gray-500 py-8">
+                        <p class="text-4xl mb-4">📂</p>
+                        <p>Aucun fichier trouvé</p>
+                        <p class="text-sm mt-2">Formats supportés : PDF, TXT, MD, DOCX, EML</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div x-show="activeTab === 'settings'" x-cloak>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Paramètres LLM -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4">🤖 Modèle LLM</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Modèle utilisé</label>
+                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.llm_model"></p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">
+                                Température : <span x-text="settings.temperature"></span>
+                            </label>
+                            <input type="range" min="0" max="1" step="0.1" 
+                                   x-model="settings.temperature"
+                                   @change="updateSettings()"
+                                   class="w-full accent-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">0 = précis, 1 = créatif</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">
+                                Nombre de chunks (top_k) : <span x-text="settings.top_k"></span>
+                            </label>
+                            <input type="range" min="1" max="10" step="1" 
+                                   x-model="settings.top_k"
+                                   @change="updateSettings()"
+                                   class="w-full accent-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Plus = plus de contexte, mais plus lent</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paramètres RAG -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4">🔍 Configuration RAG</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Modèle d'embedding</label>
+                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.embedding_model"></p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Taille des chunks</label>
+                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.chunk_size + ' caractères'"></p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Chevauchement</label>
+                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.chunk_overlap + ' caractères'"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modèles Ollama -->
+                <div class="bg-gray-800 rounded-xl p-6 md:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold">📦 Modèles Ollama disponibles</h2>
+                        <button @click="fetchOllamaModels()" class="text-sm text-blue-400 hover:text-blue-300">
+                            🔄 Rafraîchir
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <template x-for="model in ollamaModels" :key="model.name">
+                            <div class="bg-gray-700 rounded-lg p-3">
+                                <p class="font-medium truncate" x-text="model.name"></p>
+                                <p class="text-xs text-gray-400" x-text="formatSize(model.size)"></p>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <div x-show="ollamaModels.length === 0" class="text-center text-gray-500 py-4">
+                        <p x-show="ollamaConnected">Aucun modèle trouvé</p>
+                        <p x-show="!ollamaConnected">Ollama non connecté</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function ragApp() {
+            return {
+                activeTab: 'chat',
+                query: '',
+                messages: [],
+                currentSources: [],
+                loading: false,
+                indexing: false,
+                indexResult: null,
+                files: [],
+                ollamaConnected: false,
+                ollamaModels: [],
+                stats: {
+                    index: { exists: false, total_documents: 0, total_chunks: 0 },
+                    settings: { llm_model: '', embedding_model: '', chunk_size: 0, chunk_overlap: 0, temperature: 0.7, top_k: 4 }
+                },
+                settings: {
+                    temperature: 0.7,
+                    top_k: 4
+                },
+                
+                async init() {
+                    await this.checkHealth();
+                    await this.refreshFiles();
+                    await this.fetchStats();
+                    await this.fetchOllamaModels();
+                    
+                    // Polling health check
+                    setInterval(() => this.checkHealth(), 30000);
+                },
+                
+                async checkHealth() {
+                    try {
+                        const res = await fetch('/health');
+                        const data = await res.json();
+                        this.ollamaConnected = data.ollama_connected;
+                    } catch {
+                        this.ollamaConnected = false;
+                    }
+                },
+                
+                async refreshFiles() {
+                    try {
+                        const res = await fetch('/api/files');
+                        const data = await res.json();
+                        this.files = data.files;
+                    } catch (e) {
+                        console.error('Erreur refresh files:', e);
+                    }
+                },
+                
+                async fetchStats() {
+                    try {
+                        const res = await fetch('/api/stats');
+                        const data = await res.json();
+                        this.stats = data;
+                        this.settings.temperature = data.settings.temperature;
+                        this.settings.top_k = data.settings.top_k;
+                    } catch (e) {
+                        console.error('Erreur fetch stats:', e);
+                    }
+                },
+                
+                async fetchOllamaModels() {
+                    try {
+                        const res = await fetch('/api/ollama/models');
+                        const data = await res.json();
+                        this.ollamaModels = data.models;
+                    } catch {
+                        this.ollamaModels = [];
+                    }
+                },
+                
+                async indexDocuments() {
+                    this.indexing = true;
+                    this.indexResult = null;
+                    
+                    try {
+                        const res = await fetch('/api/index', { method: 'POST' });
+                        this.indexResult = await res.json();
+                        if (res.ok) {
+                            await this.fetchStats();
+                        }
+                    } catch (e) {
+                        this.indexResult = { success: false, error: e.message };
+                    }
+                    
+                    this.indexing = false;
+                },
+                
+                async sendQuery() {
+                    if (!this.query.trim() || this.loading) return;
+                    
+                    const question = this.query;
+                    this.query = '';
+                    this.messages.push({ type: 'user', content: question });
+                    this.loading = true;
+                    this.scrollChat();
+                    
+                    try {
+                        const res = await fetch('/api/query', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                question, 
+                                top_k: parseInt(this.settings.top_k) 
+                            })
+                        });
+                        
+                        const data = await res.json();
+                        
+                        if (res.ok) {
+                            this.messages.push({ 
+                                type: 'assistant', 
+                                content: data.answer,
+                                metrics: data.metrics
+                            });
+                            this.currentSources = data.sources;
+                        } else {
+                            this.messages.push({ 
+                                type: 'assistant', 
+                                content: '❌ Erreur : ' + (data.detail || 'Erreur inconnue')
+                            });
+                        }
+                    } catch (e) {
+                        this.messages.push({ 
+                            type: 'assistant', 
+                            content: '❌ Erreur de connexion : ' + e.message
+                        });
+                    }
+                    
+                    this.loading = false;
+                    this.scrollChat();
+                },
+                
+                async updateSettings() {
+                    try {
+                        await fetch('/api/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                temperature: parseFloat(this.settings.temperature),
+                                top_k: parseInt(this.settings.top_k)
+                            })
+                        });
+                    } catch (e) {
+                        console.error('Erreur update settings:', e);
+                    }
+                },
+                
+                scrollChat() {
+                    this.$nextTick(() => {
+                        const container = document.getElementById('chat-messages');
+                        if (container) {
+                            container.scrollTop = container.scrollHeight;
+                        }
+                    });
+                },
+                
+                formatSize(bytes) {
+                    if (bytes === 0) return '0 B';
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+                },
+                
+                getFileIcon(type) {
+                    const icons = {
+                        'pdf': '📕',
+                        'txt': '📄',
+                        'md': '📝',
+                        'docx': '📘',
+                        'eml': '📧'
+                    };
+                    return icons[type] || '📎';
+                }
+            };
+        }
+    </script>
+</body>
+</html>
