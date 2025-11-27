@@ -1,4 +1,4 @@
-/* Styles additionnels pour RAG Local */
+/* Family RAG - Styles */
 
 /* Cacher les éléments avec x-cloak avant qu'Alpine.js soit chargé */
 [x-cloak] {
@@ -25,7 +25,21 @@
     background: #6b7280;
 }
 
-/* Animation pour les messages */
+/* Animation float pour le logo */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Animation slide in pour les cards uniquement */
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -37,8 +51,22 @@
     }
 }
 
-#chat-messages > div {
-    animation: slideIn 0.2s ease-out;
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Animation pulse glow */
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(217, 70, 239, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(217, 70, 239, 0.4);
+    }
+}
+
+.animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
 }
 
 /* Limite les lignes de texte */
@@ -54,7 +82,7 @@ input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     height: 6px;
-    background: #374151;
+    background: linear-gradient(to right, #374151, #4b5563);
     border-radius: 3px;
     outline: none;
 }
@@ -62,25 +90,133 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
-    background: #3b82f6;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #d946ef, #a21caf);
     border-radius: 50%;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(217, 70, 239, 0.4);
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-    background: #2563eb;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(217, 70, 239, 0.6);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #d946ef, #a21caf);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(217, 70, 239, 0.4);
+}
+
+/* Select personnalisé */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
 }
 
 /* Focus states */
-input:focus, button:focus {
+input:focus, 
+button:focus,
+select:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
 }
 
 /* Transitions douces */
-button, input, a {
+button, input, a, select, div {
     transition: all 0.2s ease;
+}
+
+/* Glass effect */
+.glass {
+    background: rgba(31, 41, 55, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Gradient text */
+.gradient-text {
+    background: linear-gradient(135deg, #e879f9, #d946ef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Card hover effect */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px -10px rgba(217, 70, 239, 0.2);
+}
+
+/* Loading dots bounce */
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-8px);
+    }
+}
+
+/* Smooth scroll */
+.scroll-smooth {
+    scroll-behavior: smooth;
+}
+
+/* Status indicator pulse */
+@keyframes statusPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Selection color */
+::selection {
+    background: rgba(217, 70, 239, 0.3);
+    color: white;
+}
+
+/* Placeholder styling */
+::placeholder {
+    color: #6b7280;
+    opacity: 1;
+}
+
+/* Input autofill styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #374151 inset;
+    -webkit-text-fill-color: #f3f4f6;
+    transition: background-color 5000s ease-in-out 0s;
 }
