@@ -105,47 +105,52 @@ Optimisé pour Apple Silicon (M1/M2/M3), FamilyRAG exploite la puissance de votr
 
 ---
 
-## 🚀 Installation
+## Installation
 
-### Prérequis
-
-- macOS avec Apple Silicon (M1/M2/M3)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Ollama](https://ollama.ai/)
-
-### Étape 1 — Préparer Ollama
+### 1. Installer les modèles Ollama
 
 ```bash
-# Installer Ollama
-brew install ollama
-
-# Démarrer le service
-ollama serve
-```
-
-Dans un autre terminal :
-
-```bash
-# Télécharger les modèles
+# Modèle de génération (choisir un ou plusieurs)
+ollama pull qwen2.5:7b
 ollama pull mistral:latest
+
+# Modèle d'embedding (obligatoire)
 ollama pull nomic-embed-text
 ```
 
-### Étape 2 — Cloner FamilyRAG
+### 2. Configurer le projet
 
 ```bash
-git clone https://github.com/Liam4Chilll/FamilyRAG.git
-cd FamilyRAG
+# Cloner ou télécharger le projet
+cd /chemin/vers/family-rag
+
+# Créer le dossier pour vos documents
+mkdir -p RAG
+
+# Placer vos documents dans RAG/
+# Formats supportés : PDF, TXT, MD, DOCX, EML
 ```
 
-### Étape 3 — Configurer le dossier documents
+### 3. (Optionnel) Configurer le chemin des documents
 
-Éditez `docker-compose.yml` et indiquez le chemin vers vos documents :
+Par défaut, le dossier `./RAG` est utilisé. Pour un chemin personnalisé, éditez `docker-compose.yml` :
 
+```
 ```yaml
 volumes:
-  - /Users/votre-username/RAG:/data    # ← Votre dossier
-  - rag-index:/app/index
+  - /chemin/absolu/vers/vos/documents:/data
+```
+
+## Utilisation
+
+### Lancer le service
+
+```bash
+# Premier lancement (build + démarrage)
+docker-compose up -d --build
+
+# Lancements suivants
+docker-compose up -d
 ```
 
 ### Étape 4 — Lancer FamilyRAG
