@@ -1,16 +1,19 @@
 services:
-  rag:
+  family-rag:
     build: .
-    container_name: rag-local
+    container_name: family-rag
     ports:
       - "8000:8000"
     volumes:
-      #- <RENSEIGNER LE CHEMIN VERS LE DOSSIER RAG>:/data
-      - rag-index:/app/index
+      # Remplacer par le chemin absolu vers votre dossier de documents
+      # Exemple macOS : /Users/liam4chill/RAG:/data
+      # Exemple Linux : /home/liam4chill/RAG:/data
+      - /Users/liam4chill/RAG:/data
+      - family-rag-index:/app/index
     environment:
       - OLLAMA_HOST=host.docker.internal:11434
       - EMBEDDING_MODEL=nomic-embed-text
-      - LLM_MODEL=mistral:latest
+      # LLM_MODEL est auto-détecté parmi les modèles Ollama disponibles
       - CHUNK_SIZE=1000
       - CHUNK_OVERLAP=200
     restart: unless-stopped
@@ -21,5 +24,5 @@ services:
       retries: 3
 
 volumes:
-  rag-index:
-    name: rag-local-index
+  family-rag-index:
+    name: family-rag-index
