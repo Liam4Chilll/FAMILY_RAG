@@ -19,7 +19,7 @@
 
 ---
 
-<h1 align="center">📚 FamilyRAG</h1>
+<h1 align="center">📚 FamilyRAG 2.1.0</h1>
 
 <h3 align="center">
   <em>Votre bibliothèque interactive intergénérationnelle, 100% locale</em>
