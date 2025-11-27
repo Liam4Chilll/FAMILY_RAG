@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Ollama
     ollama_host: str = "host.docker.internal:11434"
     embedding_model: str = "nomic-embed-text"
-    llm_model: str = "mistral:latest"
+    llm_model: str = ""  # Auto-détecté au démarrage si vide
     
     # RAG
     chunk_size: int = 1000
