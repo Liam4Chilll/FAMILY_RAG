@@ -140,7 +140,7 @@ class DocumentLoader:
         
         parts = []
         
-        # Entêtes
+        # En-têtes
         if msg['subject']:
             parts.append(f"Sujet: {msg['subject']}")
         if msg['from']:
