@@ -2,6 +2,7 @@
 
 import os
 import time
+import httpx
 from pathlib import Path
 from typing import Optional, List
 from dataclasses import dataclass
@@ -44,6 +45,11 @@ class RAGEngine:
         self.index_path = Path(self.settings.index_dir) / "faiss_index"
         self.vectorstore: Optional[FAISS] = None
         self.doc_loader = DocumentLoader()
+        self.llm: Optional[ChatOllama] = None
+        
+        # Auto-détecter le modèle LLM si non spécifié
+        if not self.settings.llm_model:
+            self.settings.llm_model = self._detect_llm_model()
         
         # Initialiser les composants Ollama
         self.embeddings = OllamaEmbeddings(
@@ -51,14 +57,40 @@ class RAGEngine:
             base_url=self.settings.ollama_base_url
         )
         
-        self.llm = ChatOllama(
-            model=self.settings.llm_model,
-            base_url=self.settings.ollama_base_url,
-            temperature=self.settings.temperature
-        )
+        # Initialiser le LLM seulement si un modèle est disponible
+        if self.settings.llm_model:
+            self.llm = ChatOllama(
+                model=self.settings.llm_model,
+                base_url=self.settings.ollama_base_url,
+                temperature=self.settings.temperature
+            )
         
         # Charger l'index existant si disponible
         self._load_index()
+    
+    def _detect_llm_model(self) -> str:
+        """Détecte automatiquement un modèle LLM disponible dans Ollama."""
+        try:
+            response = httpx.get(
+                f"{self.settings.ollama_base_url}/api/tags",
+                timeout=5.0
+            )
+            if response.status_code == 200:
+                models = response.json().get("models", [])
+                # Exclure les modèles d'embedding connus
+                embedding_models = {"nomic-embed-text", "mxbai-embed-large", "all-minilm", "snowflake-arctic-embed"}
+                for model in models:
+                    name = model.get("name", "")
+                    # Vérifier que ce n'est pas un modèle d'embedding
+                    base_name = name.split(":")[0]
+                    if base_name not in embedding_models:
+                        print(f"[Family RAG] Modèle LLM auto-détecté : {name}")
+                        return name
+        except Exception as e:
+            print(f"[Family RAG] Impossible de détecter les modèles Ollama : {e}")
+        
+        print("[Family RAG] Aucun modèle LLM trouvé. Installez un modèle avec 'ollama pull <modele>'")
+        return ""
     
     def _load_index(self) -> bool:
         """Charge l'index FAISS depuis le disque."""
@@ -125,6 +157,15 @@ class RAGEngine:
     
     def query(self, question: str, top_k: Optional[int] = None) -> QueryResult:
         """Exécute une requête RAG."""
+        if not self.llm or not self.settings.llm_model:
+            return QueryResult(
+                answer="Aucun modèle LLM disponible. Installez un modèle avec 'ollama pull <modele>' puis sélectionnez-le dans les paramètres.",
+                sources=[],
+                query_time_ms=0,
+                chunks_found=0,
+                model_used="Aucun"
+            )
+        
         if not self.vectorstore:
             return QueryResult(
                 answer="Aucun document n'a été indexé. Veuillez d'abord indexer vos documents.",
@@ -211,14 +252,28 @@ Réponse:""")
             index_exists=self.index_path.exists()
         )
     
-    def update_settings(self, temperature: Optional[float] = None, top_k: Optional[int] = None):
+    def update_settings(
+        self, 
+        temperature: Optional[float] = None, 
+        top_k: Optional[int] = None,
+        llm_model: Optional[str] = None
+    ):
         """Met à jour les paramètres du moteur."""
+        rebuild_llm = False
+        
         if temperature is not None:
             self.settings.temperature = temperature
+            rebuild_llm = True
+        
+        if llm_model is not None:
+            self.settings.llm_model = llm_model
+            rebuild_llm = True
+        
+        if rebuild_llm and self.settings.llm_model:
             self.llm = ChatOllama(
                 model=self.settings.llm_model,
                 base_url=self.settings.ollama_base_url,
-                temperature=temperature
+                temperature=self.settings.temperature
             )
         
         if top_k is not None:
