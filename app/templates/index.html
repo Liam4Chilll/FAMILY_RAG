@@ -3,10 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAG Local</title>
+    <title>Family RAG</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'family': {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
     <div x-data="ragApp()" x-init="init()" class="container mx-auto px-4 py-8 max-w-6xl">
@@ -14,12 +36,22 @@
         <!-- Header -->
         <header class="mb-8">
             <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-white">RAG Local</h1>
-                    <p class="text-gray-400 mt-1">Interrogez vos documents avec l'IA</p>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 bg-gradient-to-br from-family-500 to-family-700 rounded-xl flex items-center justify-center shadow-lg shadow-family-500/25 animate-float">
+                            <span class="text-2xl">🏠</span>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900" x-show="ollamaConnected"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-family-400 to-family-600 bg-clip-text text-transparent">
+                            Family RAG
+                        </h1>
+                        <p class="text-gray-400 mt-1">Votre assistant documentaire familial</p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="flex items-center gap-2">
+                    <span class="flex items-center gap-2 bg-gray-800 px-3 py-2 rounded-lg">
                         <span class="relative flex h-3 w-3">
                             <span :class="ollamaConnected ? 'bg-green-400' : 'bg-red-400'" 
                                   class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
@@ -33,45 +65,45 @@
         </header>
 
         <!-- Navigation -->
-        <nav class="flex gap-1 mb-6 bg-gray-800 p-1 rounded-lg w-fit">
+        <nav class="flex gap-1 mb-6 bg-gray-800/50 backdrop-blur p-1.5 rounded-xl w-fit border border-gray-700/50">
             <button @click="activeTab = 'chat'" 
-                    :class="activeTab === 'chat' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'"
-                    class="px-4 py-2 rounded-md transition-colors font-medium">
-                💬 Chat
+                    :class="activeTab === 'chat' ? 'bg-gradient-to-r from-family-600 to-family-700 text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'"
+                    class="px-5 py-2.5 rounded-lg transition-all duration-300 font-medium flex items-center gap-2">
+                <span>💬</span> Chat
             </button>
             <button @click="activeTab = 'documents'" 
-                    :class="activeTab === 'documents' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'"
-                    class="px-4 py-2 rounded-md transition-colors font-medium">
-                📁 Documents
+                    :class="activeTab === 'documents' ? 'bg-gradient-to-r from-family-600 to-family-700 text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'"
+                    class="px-5 py-2.5 rounded-lg transition-all duration-300 font-medium flex items-center gap-2">
+                <span>📁</span> Documents
             </button>
             <button @click="activeTab = 'settings'" 
-                    :class="activeTab === 'settings' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'"
-                    class="px-4 py-2 rounded-md transition-colors font-medium">
-                ⚙️ Paramètres
+                    :class="activeTab === 'settings' ? 'bg-gradient-to-r from-family-600 to-family-700 text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'"
+                    class="px-5 py-2.5 rounded-lg transition-all duration-300 font-medium flex items-center gap-2">
+                <span>⚙️</span> Paramètres
             </button>
         </nav>
 
         <!-- Chat Tab -->
-        <div x-show="activeTab === 'chat'" x-cloak>
+        <div x-show="activeTab === 'chat'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- Zone de chat -->
-                <div class="lg:col-span-2 bg-gray-800 rounded-xl p-6">
+                <div class="lg:col-span-2 bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700/50">
                     
                     <!-- Messages -->
-                    <div class="h-96 overflow-y-auto mb-4 space-y-4" id="chat-messages">
+                    <div class="h-96 overflow-y-auto mb-4 space-y-4 scroll-smooth" id="chat-messages">
                         <template x-for="(msg, index) in messages" :key="index">
                             <div :class="msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'">
-                                <div :class="msg.type === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'"
-                                     class="max-w-[80%] rounded-2xl px-4 py-3">
+                                <div :class="msg.type === 'user' ? 'bg-gradient-to-r from-family-600 to-family-700 text-white' : 'bg-gray-700/70 text-gray-100'"
+                                     class="max-w-[80%] rounded-2xl px-4 py-3 shadow-lg">
                                     <p class="whitespace-pre-wrap" x-text="msg.content"></p>
                                     
                                     <!-- Métriques pour les réponses -->
                                     <template x-if="msg.metrics">
-                                        <div class="mt-2 pt-2 border-t border-gray-600 text-xs text-gray-400 flex gap-4">
-                                            <span>⏱️ <span x-text="msg.metrics.query_time_ms"></span>ms</span>
-                                            <span>📄 <span x-text="msg.metrics.chunks_found"></span> chunks</span>
-                                            <span>🤖 <span x-text="msg.metrics.model"></span></span>
+                                        <div class="mt-2 pt-2 border-t border-gray-600/50 text-xs text-gray-300 flex flex-wrap gap-3">
+                                            <span class="flex items-center gap-1">⏱️ <span x-text="msg.metrics.query_time_ms"></span>ms</span>
+                                            <span class="flex items-center gap-1">📄 <span x-text="msg.metrics.chunks_found"></span> chunks</span>
+                                            <span class="flex items-center gap-1">🤖 <span x-text="msg.metrics.model"></span></span>
                                         </div>
                                     </template>
                                 </div>
@@ -80,20 +112,22 @@
                         
                         <!-- Indicateur de chargement -->
                         <div x-show="loading" class="flex justify-start">
-                            <div class="bg-gray-700 rounded-2xl px-4 py-3">
-                                <div class="flex gap-1">
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                            <div class="bg-gray-700/70 rounded-2xl px-4 py-3">
+                                <div class="flex gap-1.5">
+                                    <span class="w-2.5 h-2.5 bg-family-400 rounded-full animate-bounce"></span>
+                                    <span class="w-2.5 h-2.5 bg-family-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
+                                    <span class="w-2.5 h-2.5 bg-family-600 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Message initial -->
                         <div x-show="messages.length === 0 && !loading" class="text-center text-gray-500 py-16">
-                            <p class="text-4xl mb-4">💬</p>
-                            <p>Posez une question sur vos documents</p>
-                            <p class="text-sm mt-2" x-show="!stats.index.exists">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-family-500/20 to-family-700/20 rounded-full flex items-center justify-center">
+                                <span class="text-4xl">💬</span>
+                            </div>
+                            <p class="text-lg">Posez une question sur vos documents</p>
+                            <p class="text-sm mt-2 text-family-400" x-show="!stats.index.exists">
                                 ⚠️ Indexez d'abord vos documents dans l'onglet Documents
                             </p>
                         </div>
@@ -105,29 +139,38 @@
                                x-model="query" 
                                placeholder="Posez votre question..."
                                :disabled="loading || !stats.index.exists"
-                               class="flex-1 bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 disabled:opacity-50">
+                               class="flex-1 bg-gray-700/50 border border-gray-600/50 rounded-xl px-4 py-3 focus:outline-none focus:border-family-500 focus:ring-2 focus:ring-family-500/20 disabled:opacity-50 transition-all">
                         <button type="submit" 
                                 :disabled="loading || !query.trim() || !stats.index.exists"
-                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-6 py-3 rounded-xl font-medium transition-colors">
+                                class="bg-gradient-to-r from-family-600 to-family-700 hover:from-family-500 hover:to-family-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg shadow-family-500/25 disabled:shadow-none">
                             Envoyer
                         </button>
                     </form>
                 </div>
                 
                 <!-- Sources -->
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <h3 class="font-semibold mb-4 text-lg">📚 Sources</h3>
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700/50">
+                    <h3 class="font-semibold mb-4 text-lg flex items-center gap-2">
+                        <span class="w-8 h-8 bg-family-500/20 rounded-lg flex items-center justify-center">📚</span>
+                        Sources
+                    </h3>
                     
-                    <div x-show="currentSources.length === 0" class="text-gray-500 text-sm">
+                    <div x-show="currentSources.length === 0" class="text-gray-500 text-sm text-center py-8">
+                        <div class="w-12 h-12 mx-auto mb-3 bg-gray-700/50 rounded-full flex items-center justify-center">
+                            <span class="text-xl opacity-50">📑</span>
+                        </div>
                         Les sources apparaîtront ici après une requête
                     </div>
                     
                     <div class="space-y-3">
                         <template x-for="(source, index) in currentSources" :key="index">
-                            <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="bg-gray-700/50 rounded-xl p-3 border border-gray-600/30 hover:border-family-500/30 transition-all duration-300 animate-slideIn" :style="'animation-delay: ' + (index * 0.1) + 's'">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="font-medium text-sm truncate" x-text="source.source"></span>
-                                    <span class="text-xs bg-blue-600 px-2 py-0.5 rounded-full" 
+                                    <span class="font-medium text-sm truncate flex items-center gap-2">
+                                        <span x-text="getFileIcon(source.source.split('.').pop())"></span>
+                                        <span x-text="source.source"></span>
+                                    </span>
+                                    <span class="text-xs bg-gradient-to-r from-family-600 to-family-700 px-2 py-0.5 rounded-full" 
                                           x-text="(source.score * 100).toFixed(1) + '%'"></span>
                                 </div>
                                 <p class="text-xs text-gray-400 line-clamp-3" x-text="source.preview"></p>
@@ -139,23 +182,26 @@
         </div>
 
         <!-- Documents Tab -->
-        <div x-show="activeTab === 'documents'" x-cloak>
-            <div class="bg-gray-800 rounded-xl p-6">
+        <div x-show="activeTab === 'documents'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
+            <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700/50">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h2 class="text-xl font-semibold">Documents disponibles</h2>
-                        <p class="text-gray-400 text-sm mt-1">Placez vos fichiers dans le dossier RAG/</p>
+                        <h2 class="text-xl font-semibold flex items-center gap-3">
+                            <span class="w-10 h-10 bg-family-500/20 rounded-xl flex items-center justify-center">📂</span>
+                            Documents disponibles
+                        </h2>
+                        <p class="text-gray-400 text-sm mt-2 ml-13">Placez vos fichiers dans le dossier RAG/</p>
                     </div>
                     <div class="flex gap-3">
                         <button @click="refreshFiles()" 
                                 :disabled="indexing"
-                                class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition-colors">
-                            🔄 Rafraîchir
+                                class="bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600/50 px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+                            <span :class="{'animate-spin': refreshingFiles}">🔄</span> Rafraîchir
                         </button>
                         <button @click="indexDocuments()" 
                                 :disabled="indexing || files.length === 0"
-                                class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-2 rounded-lg font-medium transition-colors">
-                            <span x-show="!indexing">📥 Indexer les documents</span>
+                                class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed px-4 py-2 rounded-xl font-medium transition-all duration-300 shadow-lg shadow-green-500/25 disabled:shadow-none flex items-center gap-2">
+                            <span x-show="!indexing">📥 Indexer</span>
                             <span x-show="indexing" class="flex items-center gap-2">
                                 <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -169,139 +215,192 @@
                 
                 <!-- Stats index -->
                 <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="bg-gray-700 rounded-lg p-4 text-center">
-                        <p class="text-2xl font-bold" x-text="files.length">0</p>
-                        <p class="text-sm text-gray-400">Fichiers détectés</p>
+                    <div class="bg-gray-700/30 rounded-xl p-4 text-center border border-gray-600/30 hover:border-family-500/30 transition-all duration-300">
+                        <p class="text-3xl font-bold bg-gradient-to-r from-family-400 to-family-600 bg-clip-text text-transparent" x-text="files.length">0</p>
+                        <p class="text-sm text-gray-400 mt-1">Fichiers détectés</p>
                     </div>
-                    <div class="bg-gray-700 rounded-lg p-4 text-center">
-                        <p class="text-2xl font-bold" x-text="stats.index.total_chunks">0</p>
-                        <p class="text-sm text-gray-400">Chunks indexés</p>
+                    <div class="bg-gray-700/30 rounded-xl p-4 text-center border border-gray-600/30 hover:border-family-500/30 transition-all duration-300">
+                        <p class="text-3xl font-bold bg-gradient-to-r from-family-400 to-family-600 bg-clip-text text-transparent" x-text="stats.index.total_chunks">0</p>
+                        <p class="text-sm text-gray-400 mt-1">Chunks indexés</p>
                     </div>
-                    <div class="bg-gray-700 rounded-lg p-4 text-center">
-                        <p class="text-2xl font-bold" x-text="stats.index.exists ? '✓' : '✗'"></p>
-                        <p class="text-sm text-gray-400">Index actif</p>
+                    <div class="bg-gray-700/30 rounded-xl p-4 text-center border border-gray-600/30 hover:border-family-500/30 transition-all duration-300">
+                        <p class="text-3xl font-bold" :class="stats.index.exists ? 'text-green-400' : 'text-red-400'" x-text="stats.index.exists ? '✓' : '✗'"></p>
+                        <p class="text-sm text-gray-400 mt-1">Index actif</p>
                     </div>
                 </div>
                 
                 <!-- Notification -->
-                <div x-show="indexResult" x-transition 
-                     :class="indexResult?.success ? 'bg-green-900/50 border-green-700' : 'bg-red-900/50 border-red-700'"
-                     class="border rounded-lg p-4 mb-6">
+                <div x-show="indexResult" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0"
+                     :class="indexResult?.success ? 'bg-green-900/30 border-green-500/50' : 'bg-red-900/30 border-red-500/50'"
+                     class="border rounded-xl p-4 mb-6 backdrop-blur">
                     <template x-if="indexResult?.success">
-                        <p>✅ Indexation terminée : <span x-text="indexResult.documents"></span> documents, 
-                           <span x-text="indexResult.chunks"></span> chunks en <span x-text="indexResult.time_seconds"></span>s</p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-green-400">✅</span>
+                            Indexation terminée : <span class="font-semibold" x-text="indexResult.documents"></span> documents, 
+                            <span class="font-semibold" x-text="indexResult.chunks"></span> chunks en 
+                            <span class="font-semibold" x-text="indexResult.time_seconds"></span>s
+                        </p>
                     </template>
                     <template x-if="indexResult && !indexResult.success">
-                        <p>❌ Erreur : <span x-text="indexResult.error"></span></p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-red-400">❌</span>
+                            Erreur : <span x-text="indexResult.error"></span>
+                        </p>
                     </template>
                 </div>
                 
                 <!-- Liste des fichiers -->
                 <div class="space-y-2">
-                    <template x-for="file in files" :key="file.path">
-                        <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3">
+                    <template x-for="(file, index) in files" :key="file.path">
+                        <div class="flex items-center justify-between bg-gray-700/30 rounded-xl px-4 py-3 border border-gray-600/30 hover:border-family-500/30 hover:bg-gray-700/50 transition-all duration-300 animate-slideIn" :style="'animation-delay: ' + (index * 0.05) + 's'">
                             <div class="flex items-center gap-3">
-                                <span class="text-xl" x-text="getFileIcon(file.type)"></span>
+                                <span class="text-xl w-8 h-8 bg-gray-600/50 rounded-lg flex items-center justify-center" x-text="getFileIcon(file.type)"></span>
                                 <span x-text="file.name"></span>
                             </div>
-                            <span class="text-sm text-gray-400" x-text="formatSize(file.size)"></span>
+                            <span class="text-sm text-gray-400 bg-gray-600/30 px-2 py-1 rounded-lg" x-text="formatSize(file.size)"></span>
                         </div>
                     </template>
                     
-                    <div x-show="files.length === 0" class="text-center text-gray-500 py-8">
-                        <p class="text-4xl mb-4">📂</p>
-                        <p>Aucun fichier trouvé</p>
-                        <p class="text-sm mt-2">Formats supportés : PDF, TXT, MD, DOCX, EML</p>
+                    <div x-show="files.length === 0" class="text-center text-gray-500 py-12">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gray-700/30 rounded-full flex items-center justify-center">
+                            <span class="text-4xl opacity-50">📂</span>
+                        </div>
+                        <p class="text-lg">Aucun fichier trouvé</p>
+                        <p class="text-sm mt-2 text-gray-600">Formats supportés : PDF, TXT, MD, DOCX, EML</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Settings Tab -->
-        <div x-show="activeTab === 'settings'" x-cloak>
+        <div x-show="activeTab === 'settings'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <!-- Paramètres LLM -->
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <h2 class="text-xl font-semibold mb-4">🤖 Modèle LLM</h2>
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700/50">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-family-500/20 rounded-xl flex items-center justify-center">🤖</span>
+                        Modèle LLM
+                    </h2>
                     
-                    <div class="space-y-4">
+                    <div class="space-y-5">
+                        <!-- Sélecteur de modèle -->
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">Modèle utilisé</label>
-                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.llm_model"></p>
+                            <label class="block text-sm text-gray-400 mb-2">Modèle actif</label>
+                            <select x-model="selectedModel" 
+                                    @change="changeModel()"
+                                    :disabled="ollamaModels.length === 0"
+                                    class="w-full bg-gray-700/50 border border-gray-600/50 rounded-xl px-4 py-3 focus:outline-none focus:border-family-500 focus:ring-2 focus:ring-family-500/20 transition-all appearance-none cursor-pointer disabled:opacity-50">
+                                <template x-for="model in ollamaModels" :key="model.name">
+                                    <option :value="model.name" x-text="model.name + ' (' + formatSize(model.size) + ')'"></option>
+                                </template>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-2">Sélectionnez parmi les modèles installés dans Ollama</p>
                         </div>
                         
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">
-                                Température : <span x-text="settings.temperature"></span>
+                                Température : <span class="text-family-400 font-medium" x-text="settings.temperature"></span>
                             </label>
                             <input type="range" min="0" max="1" step="0.1" 
                                    x-model="settings.temperature"
                                    @change="updateSettings()"
-                                   class="w-full accent-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">0 = précis, 1 = créatif</p>
+                                   class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>Précis</span>
+                                <span>Créatif</span>
+                            </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">
-                                Nombre de chunks (top_k) : <span x-text="settings.top_k"></span>
+                                Chunks (top_k) : <span class="text-family-400 font-medium" x-text="settings.top_k"></span>
                             </label>
                             <input type="range" min="1" max="10" step="1" 
                                    x-model="settings.top_k"
                                    @change="updateSettings()"
-                                   class="w-full accent-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">Plus = plus de contexte, mais plus lent</p>
+                                   class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>Rapide</span>
+                                <span>Plus de contexte</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Paramètres RAG -->
-                <div class="bg-gray-800 rounded-xl p-6">
-                    <h2 class="text-xl font-semibold mb-4">🔍 Configuration RAG</h2>
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700/50">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-family-500/20 rounded-xl flex items-center justify-center">🔍</span>
+                        Configuration RAG
+                    </h2>
                     
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Modèle d'embedding</label>
-                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.embedding_model"></p>
+                            <div class="bg-gray-700/30 rounded-xl px-4 py-3 border border-gray-600/30">
+                                <span x-text="stats.settings.embedding_model"></span>
+                            </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Taille des chunks</label>
-                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.chunk_size + ' caractères'"></p>
+                            <div class="bg-gray-700/30 rounded-xl px-4 py-3 border border-gray-600/30">
+                                <span x-text="stats.settings.chunk_size + ' caractères'"></span>
+                            </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Chevauchement</label>
-                            <p class="bg-gray-700 rounded-lg px-4 py-3" x-text="stats.settings.chunk_overlap + ' caractères'"></p>
+                            <div class="bg-gray-700/30 rounded-xl px-4 py-3 border border-gray-600/30">
+                                <span x-text="stats.settings.chunk_overlap + ' caractères'"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Modèles Ollama -->
-                <div class="bg-gray-800 rounded-xl p-6 md:col-span-2">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold">📦 Modèles Ollama disponibles</h2>
-                        <button @click="fetchOllamaModels()" class="text-sm text-blue-400 hover:text-blue-300">
-                            🔄 Rafraîchir
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-gray-700/50 md:col-span-2">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold flex items-center gap-3">
+                            <span class="w-10 h-10 bg-family-500/20 rounded-xl flex items-center justify-center">📦</span>
+                            Modèles Ollama disponibles
+                        </h2>
+                        <button @click="fetchOllamaModels()" class="text-sm text-family-400 hover:text-family-300 transition-colors flex items-center gap-2">
+                            <span :class="{'animate-spin': fetchingModels}">🔄</span> Rafraîchir
                         </button>
                     </div>
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <template x-for="model in ollamaModels" :key="model.name">
-                            <div class="bg-gray-700 rounded-lg p-3">
-                                <p class="font-medium truncate" x-text="model.name"></p>
+                        <template x-for="(model, index) in ollamaModels" :key="model.name">
+                            <div @click="selectedModel = model.name; changeModel()"
+                                 :class="selectedModel === model.name ? 'border-family-500 bg-family-500/10' : 'border-gray-600/30 hover:border-family-500/50'"
+                                 class="bg-gray-700/30 rounded-xl p-4 border cursor-pointer transition-all duration-300 animate-slideIn" 
+                                 :style="'animation-delay: ' + (index * 0.05) + 's'">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span x-show="selectedModel === model.name" class="text-family-400">✓</span>
+                                    <p class="font-medium truncate" x-text="model.name"></p>
+                                </div>
                                 <p class="text-xs text-gray-400" x-text="formatSize(model.size)"></p>
                             </div>
                         </template>
                     </div>
                     
-                    <div x-show="ollamaModels.length === 0" class="text-center text-gray-500 py-4">
+                    <div x-show="ollamaModels.length === 0" class="text-center text-gray-500 py-8">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-gray-700/30 rounded-full flex items-center justify-center">
+                            <span class="text-2xl opacity-50">📦</span>
+                        </div>
                         <p x-show="ollamaConnected">Aucun modèle trouvé</p>
                         <p x-show="!ollamaConnected">Ollama non connecté</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-600 text-sm">
+            <p>Family RAG v2.1 — Crée par Liam4Chill</p>
+        </footer>
 
     </div>
 
@@ -318,6 +417,9 @@
                 files: [],
                 ollamaConnected: false,
                 ollamaModels: [],
+                selectedModel: '',
+                refreshingFiles: false,
+                fetchingModels: false,
                 stats: {
                     index: { exists: false, total_documents: 0, total_chunks: 0 },
                     settings: { llm_model: '', embedding_model: '', chunk_size: 0, chunk_overlap: 0, temperature: 0.7, top_k: 4 }
@@ -332,6 +434,9 @@
                     await this.refreshFiles();
                     await this.fetchStats();
                     await this.fetchOllamaModels();
+                    
+                    // Définir le modèle sélectionné
+                    this.selectedModel = this.stats.settings.llm_model;
                     
                     // Polling health check
                     setInterval(() => this.checkHealth(), 30000);
@@ -348,6 +453,7 @@
                 },
                 
                 async refreshFiles() {
+                    this.refreshingFiles = true;
                     try {
                         const res = await fetch('/api/files');
                         const data = await res.json();
@@ -355,6 +461,7 @@
                     } catch (e) {
                         console.error('Erreur refresh files:', e);
                     }
+                    this.refreshingFiles = false;
                 },
                 
                 async fetchStats() {
@@ -364,12 +471,14 @@
                         this.stats = data;
                         this.settings.temperature = data.settings.temperature;
                         this.settings.top_k = data.settings.top_k;
+                        this.selectedModel = data.settings.llm_model;
                     } catch (e) {
                         console.error('Erreur fetch stats:', e);
                     }
                 },
                 
                 async fetchOllamaModels() {
+                    this.fetchingModels = true;
                     try {
                         const res = await fetch('/api/ollama/models');
                         const data = await res.json();
@@ -377,6 +486,7 @@
                     } catch {
                         this.ollamaModels = [];
                     }
+                    this.fetchingModels = false;
                 },
                 
                 async indexDocuments() {
@@ -453,6 +563,24 @@
                         });
                     } catch (e) {
                         console.error('Erreur update settings:', e);
+                    }
+                },
+                
+                async changeModel() {
+                    if (!this.selectedModel) return;
+                    try {
+                        const res = await fetch('/api/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                llm_model: this.selectedModel
+                            })
+                        });
+                        if (res.ok) {
+                            await this.fetchStats();
+                        }
+                    } catch (e) {
+                        console.error('Erreur changement modèle:', e);
                     }
                 },
                 
