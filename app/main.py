@@ -26,9 +26,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="RAG Local",
-    description="Système RAG local avec Ollama",
-    version="1.0.0",
+    title="Family RAG",
+    description="Système RAG local pour la famille",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -47,6 +47,7 @@ class QueryRequest(BaseModel):
 class SettingsUpdate(BaseModel):
     temperature: Optional[float] = None
     top_k: Optional[int] = None
+    llm_model: Optional[str] = None
 
 
 # --- Routes API ---
@@ -129,11 +130,11 @@ async def get_stats():
         },
         "settings": {
             "embedding_model": settings.embedding_model,
-            "llm_model": settings.llm_model,
+            "llm_model": rag_engine.settings.llm_model,
             "chunk_size": settings.chunk_size,
             "chunk_overlap": settings.chunk_overlap,
-            "temperature": settings.temperature,
-            "top_k": settings.top_k
+            "temperature": rag_engine.settings.temperature,
+            "top_k": rag_engine.settings.top_k
         }
     }
 
@@ -143,9 +144,15 @@ async def update_settings(settings: SettingsUpdate):
     """Met à jour les paramètres du moteur RAG."""
     rag_engine.update_settings(
         temperature=settings.temperature,
-        top_k=settings.top_k
+        top_k=settings.top_k,
+        llm_model=settings.llm_model
     )
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "llm_model": rag_engine.settings.llm_model,
+        "temperature": rag_engine.settings.temperature,
+        "top_k": rag_engine.settings.top_k
+    }
 
 
 @app.get("/api/ollama/models")
