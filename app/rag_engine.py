@@ -2,6 +2,7 @@
 
 import os
 import time
+import base64
 import httpx
 from pathlib import Path
 from typing import Optional, List
@@ -278,3 +279,150 @@ Réponse:""")
         
         if top_k is not None:
             self.settings.top_k = top_k
+    
+    async def analyze_image_with_vision(self, image_path: str, question: str) -> dict:
+        """Analyse une image avec un modèle vision (Ministral 3)."""
+        start_time = time.time()
+        
+        # Construire le chemin complet
+        full_path = Path(self.settings.data_dir) / image_path
+        
+        if not full_path.exists():
+            return {
+                "success": False,
+                "error": f"Image non trouvée: {image_path}",
+                "analysis": None,
+                "time_ms": 0
+            }
+        
+        # Lire et encoder l'image en base64
+        with open(full_path, "rb") as f:
+            image_data = base64.b64encode(f.read()).decode("utf-8")
+        
+        # Détecter le modèle vision disponible
+        vision_model = self._detect_vision_model()
+        if not vision_model:
+            return {
+                "success": False,
+                "error": "Aucun modèle vision disponible. Installez ministral-3 avec 'ollama pull ministral-3:latest'",
+                "analysis": None,
+                "time_ms": 0
+            }
+        
+        # Appel API Ollama avec image
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    f"{self.settings.ollama_base_url}/api/chat",
+                    json={
+                        "model": vision_model,
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": question,
+                                "images": [image_data]
+                            }
+                        ],
+                        "stream": False
+                    }
+                )
+                response.raise_for_status()
+                data = response.json()
+                
+                elapsed_ms = (time.time() - start_time) * 1000
+                
+                return {
+                    "success": True,
+                    "analysis": data.get("message", {}).get("content", ""),
+                    "model": vision_model,
+                    "time_ms": round(elapsed_ms, 2)
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "analysis": None,
+                "time_ms": 0
+            }
+    
+    def _detect_vision_model(self) -> Optional[str]:
+        """Détecte un modèle vision disponible dans Ollama."""
+        vision_models = ["ministral-3:latest", "ministral-3:8b", "ministral-3:14b", "ministral-3:3b", "llava:latest", "moondream:latest"]
+        
+        try:
+            response = httpx.get(
+                f"{self.settings.ollama_base_url}/api/tags",
+                timeout=5.0
+            )
+            if response.status_code == 200:
+                models = response.json().get("models", [])
+                available = [m.get("name", "") for m in models]
+                
+                for vm in vision_models:
+                    if vm in available:
+                        return vm
+                    # Check without tag
+                    base = vm.split(":")[0]
+                    for a in available:
+                        if a.startswith(base):
+                            return a
+        except:
+            pass
+        
+        return None
+    
+    async def analyze_image_base64(self, image_data: str, question: str) -> dict:
+        """Analyse une image encodée en base64 avec un modèle vision."""
+        start_time = time.time()
+        
+        # Nettoyer le base64 si nécessaire (retirer le préfixe data:image/...)
+        if ',' in image_data:
+            image_data = image_data.split(',')[1]
+        
+        # Détecter le modèle vision disponible
+        vision_model = self._detect_vision_model()
+        if not vision_model:
+            return {
+                "success": False,
+                "error": "Aucun modèle vision disponible. Installez ministral-3 avec 'ollama pull ministral-3:latest'",
+                "analysis": None,
+                "time_ms": 0
+            }
+        
+        # Appel API Ollama avec image base64
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    f"{self.settings.ollama_base_url}/api/chat",
+                    json={
+                        "model": vision_model,
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": question,
+                                "images": [image_data]
+                            }
+                        ],
+                        "stream": False
+                    }
+                )
+                response.raise_for_status()
+                data = response.json()
+                
+                elapsed_ms = (time.time() - start_time) * 1000
+                
+                return {
+                    "success": True,
+                    "analysis": data.get("message", {}).get("content", ""),
+                    "model": vision_model,
+                    "time_ms": round(elapsed_ms, 2)
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "analysis": None,
+                "time_ms": 0
+            }
