@@ -8,11 +8,13 @@ Référence rapide pour gérer, diagnostiquer et maintenir votre instance Family
 
 | Élément | Valeur |
 |---------|--------|
+| Version | 2.5.0 |
 | Service | `family-rag` |
 | Container | `family-rag` |
 | Volume | `family-rag-index` |
 | Port | `8000` |
 | URL | http://localhost:8000 |
+| Ollama requis | 0.13.1+ |
 
 ---
 
@@ -145,6 +147,35 @@ docker exec family-rag ls -la /data/
 
 # Permissions
 chmod -R 755 ./RAG/
+```
+
+### OCR ne fonctionne pas
+
+```bash
+# Vérifier que Tesseract est installé dans le container
+docker exec family-rag tesseract --version
+
+# Vérifier les langues disponibles
+docker exec family-rag tesseract --list-langs
+```
+
+### Vision ne fonctionne pas
+
+```bash
+# Vérifier la version Ollama (0.13.1+ requis)
+ollama --version
+
+# Vérifier que Ministral 3 est installé
+ollama list | grep ministral
+
+# Installer Ministral 3 si absent
+ollama pull ministral-3:latest
+
+# Tester la vision manuellement
+curl http://localhost:11434/api/chat -d '{
+  "model": "ministral-3:latest",
+  "messages": [{"role": "user", "content": "test"}]
+}'
 ```
 
 ### Réinitialiser l'index
@@ -292,6 +323,7 @@ ollama pull mistral:latest
 | Tester l'API | `curl http://localhost:8000/health` |
 | Lister les fichiers indexés | `curl http://localhost:8000/api/files` |
 | Stats de l'index | `curl http://localhost:8000/api/stats` |
+| Vérifier Tesseract | `docker exec family-rag tesseract --version` |
 
 ---
 
