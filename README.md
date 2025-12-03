@@ -19,7 +19,7 @@
 
 ---
 
-<h1 align="center">📚 FamilyRAG 2.6.0</h1>
+<h1 align="center">📚 FamilyRAG 2.5.0</h1>
 
 <h3 align="center">
   <em>Votre bibliothèque numérique privée</em>
@@ -48,7 +48,7 @@ Imaginez pouvoir interroger en langage naturel :
 
 ---
 
-## ✨ Nouveautés v2.6
+## ✨ Nouveautés v2.5
 
 ### 📎 Upload d'images dans le chat
 - Glissez-déposez une image directement dans le chat
