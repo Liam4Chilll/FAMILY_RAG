@@ -1,8 +1,11 @@
 """API FastAPI pour le système RAG."""
 
 import httpx
+import uuid
+import shutil
+from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -28,7 +31,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Family RAG",
     description="Système RAG local pour la famille",
-    version="2.0.0",
+    version="2.6.0",
     lifespan=lifespan
 )
 
@@ -42,12 +45,23 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 class QueryRequest(BaseModel):
     question: str
     top_k: Optional[int] = None
+    image_data: Optional[str] = None  # Base64 encoded image
 
 
 class SettingsUpdate(BaseModel):
     temperature: Optional[float] = None
     top_k: Optional[int] = None
     llm_model: Optional[str] = None
+
+
+class VisionRequest(BaseModel):
+    image_path: str
+    question: str = "Décris cette image en détail et extrait tout le texte visible."
+
+
+class VisionBase64Request(BaseModel):
+    image_data: str  # Base64 encoded
+    question: str = "Décris cette image en détail et extrait tout le texte visible."
 
 
 # --- Routes API ---
@@ -184,3 +198,23 @@ async def get_ollama_models():
             status_code=503,
             detail=f"Impossible de contacter Ollama: {str(e)}"
         )
+
+
+@app.post("/api/vision")
+async def analyze_image(request: VisionRequest):
+    """Analyse une image avec un modèle vision (Ministral 3)."""
+    result = await rag_engine.analyze_image_with_vision(
+        request.image_path,
+        request.question
+    )
+    return result
+
+
+@app.post("/api/vision/base64")
+async def analyze_image_base64(request: VisionBase64Request):
+    """Analyse une image encodée en base64 avec un modèle vision."""
+    result = await rag_engine.analyze_image_base64(
+        request.image_data,
+        request.question
+    )
+    return result
