@@ -2,12 +2,17 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Dépendances système pour les parsers de documents
+# Dépendances système pour les parsers de documents + OCR
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     libmagic1 \
     poppler-utils \
+    tesseract-ocr \
+    tesseract-ocr-fra \
+    tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/*
+
+# Note: Vision LLM (Ministral 3) est utilisé via Ollama pour l'analyse d'images
 
 # Dépendances Python
 COPY app/requirements.txt .
