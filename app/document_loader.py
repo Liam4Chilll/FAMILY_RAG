@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from langchain.schema import Document
 from pypdf import PdfReader
 from docx import Document as DocxDocument
+import pytesseract
+from PIL import Image
 
 from config import get_settings
 
@@ -27,7 +29,7 @@ class LoadedDocument:
 class DocumentLoader:
     """Chargeur de documents multi-formats."""
     
-    SUPPORTED_EXTENSIONS = {'.pdf', '.txt', '.md', '.docx', '.eml'}
+    SUPPORTED_EXTENSIONS = {'.pdf', '.txt', '.md', '.docx', '.eml', '.jpg', '.jpeg', '.png'}
     
     def __init__(self):
         self.settings = get_settings()
@@ -85,6 +87,8 @@ class DocumentLoader:
                 content = self._load_docx(file_path)
             elif ext == '.eml':
                 content = self._load_eml(file_path)
+            elif ext in {'.jpg', '.jpeg', '.png'}:
+                content = self._load_image(file_path)
             else:
                 return LoadedDocument(
                     filename=file_path.name,
@@ -167,3 +171,10 @@ class DocumentLoader:
                 parts.append(payload.decode(charset, errors='replace'))
         
         return '\n'.join(parts)
+    
+    def _load_image(self, file_path: Path) -> str:
+        """Extrait le texte d'une image via OCR (Tesseract)."""
+        image = Image.open(file_path)
+        # Utilise français + anglais pour la reconnaissance
+        text = pytesseract.image_to_string(image, lang='fra+eng')
+        return text.strip()
