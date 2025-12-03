@@ -2,14 +2,14 @@
   <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
   <img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
   <img src="https://img.shields.io/badge/Docker-24.0-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
-  <img src="https://img.shields.io/badge/Ollama-LLM-000000?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama"/>
+  <img src="https://img.shields.io/badge/Ollama-0.13+-000000?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama"/>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/LangChain-0.3-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" alt="LangChain"/>
   <img src="https://img.shields.io/badge/FAISS-Vector_DB-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="FAISS"/>
-  <img src="https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind"/>
-  <img src="https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=white" alt="Alpine.js"/>
+  <img src="https://img.shields.io/badge/Ministral_3-Vision-FF6B6B?style=for-the-badge&logo=mistral&logoColor=white" alt="Ministral 3"/>
+  <img src="https://img.shields.io/badge/Tesseract-OCR-5A5A5A?style=for-the-badge&logo=google&logoColor=white" alt="Tesseract"/>
 </p>
 
 <p align="center">
@@ -19,10 +19,10 @@
 
 ---
 
-<h1 align="center">📚 FamilyRAG 2.1.0</h1>
+<h1 align="center">📚 FamilyRAG 2.6.0</h1>
 
 <h3 align="center">
-  <em>Votre bibliothèque interactive intergénérationnelle, 100% locale</em>
+  <em>Votre bibliothèque numérique privée</em>
 </h3>
 
 <p align="center">
@@ -39,6 +39,7 @@
 Imaginez pouvoir interroger en langage naturel :
 - 📄 Les documents administratifs de la famille
 - 📖 Les recettes de grand-mère numérisées
+- 🖼️ Les photos de documents et textes scannés (OCR + Vision IA)
 - 📝 Les cours et devoirs des enfants
 - 📧 Les archives emails importantes
 - 📚 Votre bibliothèque personnelle de livres et articles
@@ -47,60 +48,94 @@ Imaginez pouvoir interroger en langage naturel :
 
 ---
 
-## ✨ Pourquoi FamilyRAG ?
+## ✨ Nouveautés v2.6
 
-<table>
-<tr>
-<td width="50%">
+### 📎 Upload d'images dans le chat
+- Glissez-déposez une image directement dans le chat
+- Ou cliquez sur 📎 pour sélectionner un fichier
+- Analyse vision immédiate via Ministral 3
+- Preview de l'image dans la conversation
 
-### 🔒 Souveraineté totale
-Vos documents restent sur **votre** machine. Aucun serveur distant, aucun cloud, aucune fuite de données possible.
+### ⏹ Bouton Stop
+- Interrompez une génération trop longue
+- Feedback visuel immédiat
 
-### 🌐 100% Hors-ligne
-Une fois installé, FamilyRAG fonctionne **sans connexion internet**. Idéal pour les zones rurales ou les familles soucieuses de leur empreinte numérique.
+### 🎭 Arrière-plan immersif
+- Formes géométriques flottantes en filigrane
+- Animation fluide avec rebond aux bords
+- S'adapte au thème choisi
+- Ambiance "bibliothèque numérique"
 
-</td>
-<td width="50%">
+### 🎨 6 Thèmes UI
+- **Dark Pro** — Bleu acier, sobre et professionnel
+- **Ocean** — Cyan profond, frais et tech
+- **Forest** — Vert émeraude, nature et calme
+- **Amber** — Orange chaud, chaleureux
+- **Mono** — Noir/blanc pur, minimaliste
+- **Family** — Violet original
 
-### 👨‍👩‍👧‍👦 Intergénérationnel
-Une interface simple et intuitive, accessible aux grands-parents comme aux adolescents. Posez vos questions naturellement, obtenez des réponses claires.
+### 🔧 Améliorations
+- Détection automatique des modèles vision
+- Persistance du thème choisi
+- Interface plus légère et réactive
 
-### ⚡ Performant
-Optimisé pour Apple Silicon (M1/M2/M3), FamilyRAG exploite la puissance de votre Mac pour des réponses rapides et pertinentes.
+---
 
-</td>
-</tr>
-</table>
+## 🗂️ Formats supportés
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PDF-Documents-EC1C24?style=for-the-badge&logo=adobe-acrobat-reader&logoColor=white" alt="PDF"/>
+  <img src="https://img.shields.io/badge/TXT-Texte-4A4A4A?style=for-the-badge&logo=textpattern&logoColor=white" alt="TXT"/>
+  <img src="https://img.shields.io/badge/MD-Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white" alt="MD"/>
+  <img src="https://img.shields.io/badge/DOCX-Word-2B579A?style=for-the-badge&logo=microsoft-word&logoColor=white" alt="DOCX"/>
+  <img src="https://img.shields.io/badge/EML-Email-005FF9?style=for-the-badge&logo=mail.ru&logoColor=white" alt="EML"/>
+  <img src="https://img.shields.io/badge/JPG-Image-FFD700?style=for-the-badge&logo=image&logoColor=black" alt="JPG"/>
+  <img src="https://img.shields.io/badge/PNG-Image-FFD700?style=for-the-badge&logo=image&logoColor=black" alt="PNG"/>
+</p>
+
+**Images** : OCR Tesseract (indexation) + Vision Ministral 3 (analyse à la demande)
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      MacBook (Apple Silicon)                │
-│                                                             │
-│  ┌─────────────────┐        ┌────────────────────────────┐  │
-│  │     Ollama      │◄──────►│     Docker Container       │  │
-│  │   (natif Mac)   │  API   │                            │  │
-│  │                 │        │  ┌──────────────────────┐  │  │
-│  │ • mistral       │        │  │  FastAPI + FAISS     │  │  │
-│  │ • nomic-embed   │        │  │  + LangChain         │  │  │
-│  │                 │        │  └──────────────────────┘  │  │
-│  └─────────────────┘        │                            │  │
-│          │                  │  ┌──────────────────────┐  │  │
-│          │ GPU              │  │  WebUI               │  │  │
-│          ▼                  │  │  Tailwind + Alpine   │  │  │
-│  ┌─────────────────┐        │  └──────────────────────┘  │  │
-│  │  Apple Silicon  │        │                            │  │
-│  │   M1/M2/M3      │        │        localhost:8000      │  │
-│  └─────────────────┘        └────────────────────────────┘  │
-│                                        ▲                    │
-│  ┌─────────────────┐                   │                    │
-│  │  📁 Vos Docs    │───────────────────┘                    │
-│  │  (RAG folder)   │  volume mount                          │
-│  └─────────────────┘                                        │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                      MacBook (Apple Silicon)                    │
+│                                                                 │
+│  ┌─────────────────┐        ┌────────────────────────────────┐  │
+│  │     Ollama      │◄──────►│     Docker Container           │  │
+│  │   (natif Mac)   │  API   │                                │  │
+│  │                 │        │  ┌──────────────────────────┐  │  │
+│  │ • ministral-3   │        │  │  FastAPI + FAISS         │  │  │
+│  │ • nomic-embed   │        │  │  + LangChain + Tesseract │  │  │
+│  │                 │        │  └──────────────────────────┘  │  │
+│  └─────────────────┘        │                                │  │
+│          │                  │  ┌──────────────────────────┐  │  │
+│          │ GPU              │  │  WebUI (6 thèmes)        │  │  │
+│          ▼                  │  │  Tailwind + Alpine       │  │  │
+│  ┌─────────────────┐        │  └──────────────────────────┘  │  │
+│  │  Apple Silicon  │        │                                │  │
+│  │   M1/M2/M3      │        │        localhost:8000          │  │
+│  └─────────────────┘        └────────────────────────────────┘  │
+│                                        ▲                        │
+│  ┌─────────────────┐                   │                        │
+│  │  📁 Vos Docs    │───────────────────┘                        │
+│  │  (RAG folder)   │  volume mount                              │
+│  └─────────────────┘                                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Prérequis
+
+- **Ollama 0.13.1+** (requis pour Ministral 3)
+- Docker Desktop
+
+```bash
+# Vérifier la version Ollama
+ollama --version
 ```
 
 ---
@@ -110,7 +145,10 @@ Optimisé pour Apple Silicon (M1/M2/M3), FamilyRAG exploite la puissance de votr
 ### 1. Installer les modèles Ollama
 
 ```bash
-# Modèle de génération (choisir un ou plusieurs)
+# Modèle de génération + vision (recommandé)
+ollama pull ministral-3:latest
+
+# Ou autres modèles de génération
 ollama pull qwen2.5:7b
 ollama pull mistral:latest
 
@@ -121,71 +159,35 @@ ollama pull nomic-embed-text
 ### 2. Configurer le projet
 
 ```bash
-# Cloner ou télécharger le projet
 cd /chemin/vers/family-rag
 
-# Créer le dossier pour vos documents
+# Créer le dossier documents
 mkdir -p RAG
 
-# Placer vos documents dans RAG/
-# Formats supportés : PDF, TXT, MD, DOCX, EML
+# Placer vos fichiers dans RAG/
 ```
 
-### 3. (Optionnel) Configurer le chemin des documents
-
-Par défaut, le dossier `./RAG` est utilisé. Pour un chemin personnalisé, éditez `docker-compose.yml` :
-
-```
-```yaml
-volumes:
-  - /chemin/absolu/vers/vos/documents:/data
-```
-
-## Utilisation
-
-### Lancer le service
-
-```bash
-# Premier lancement (build + démarrage)
-docker-compose up -d --build
-
-# Lancements suivants
-docker-compose up -d
-```
-
-### Étape 4 — Lancer FamilyRAG
+### 3. Lancer
 
 ```bash
 docker-compose up -d --build
 ```
 
-### Étape 5 — C'est prêt !
+### 4. C'est prêt !
 
-Ouvrez **http://localhost:8000** et commencez à interroger vos documents. 🎉
-
----
-
-## 📂 Formats supportés
-
-<p align="center">
-  <img src="https://img.shields.io/badge/PDF-Documents-EC1C24?style=for-the-badge&logo=adobe-acrobat-reader&logoColor=white" alt="PDF"/>
-  <img src="https://img.shields.io/badge/TXT-Texte-4A4A4A?style=for-the-badge&logo=textpattern&logoColor=white" alt="TXT"/>
-  <img src="https://img.shields.io/badge/MD-Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white" alt="MD"/>
-  <img src="https://img.shields.io/badge/DOCX-Word-2B579A?style=for-the-badge&logo=microsoft-word&logoColor=white" alt="DOCX"/>
-  <img src="https://img.shields.io/badge/EML-Email-005FF9?style=for-the-badge&logo=mail.ru&logoColor=white" alt="EML"/>
-</p>
+Ouvrez **http://localhost:8000** 🎉
 
 ---
 
 ## 📖 Documentation
 
-Pour l'administration, la configuration avancée et le dépannage, consultez le **[Guide d'Administration](MANAGE.md)**.
+Consultez le **[Guide d'Administration](MANAGE.md)** pour la maintenance et le dépannage.
 
 ---
 
 ## 📜 Licence
 
-Ce projet est distribué sous licence **MIT**. Utilisez-le, modifiez-le, partagez-le librement.
+Ce projet est distribué sous licence **MIT**.
 
 ---
 
