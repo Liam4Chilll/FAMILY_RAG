@@ -22,10 +22,10 @@ Référence rapide pour gérer, diagnostiquer et maintenir votre instance Family
 
 ```bash
 # Premier lancement (build + start)
-docker-compose up -d --build
+docker compose up -d --build
 
 # Lancements suivants
-docker-compose up -d
+docker compose up -d
 ```
 
 ---
@@ -34,10 +34,10 @@ docker-compose up -d
 
 ```bash
 # Arrêt simple (conserve l'index)
-docker-compose down
+docker compose down
 
 # Arrêt + suppression de l'index
-docker-compose down -v
+docker compose down -v
 ```
 
 ---
@@ -48,7 +48,7 @@ docker-compose down -v
 
 ```bash
 # État du container
-docker-compose ps
+docker compose ps
 
 # Santé de l'application
 curl -s http://localhost:8000/health | jq
@@ -58,13 +58,13 @@ curl -s http://localhost:8000/health | jq
 
 ```bash
 # Logs en temps réel
-docker-compose logs -f
+docker compose logs -f
 
 # Dernières 50 lignes
-docker-compose logs --tail 50
+docker compose logs --tail 50
 
 # Logs avec timestamp
-docker-compose logs -t
+docker compose logs -t
 ```
 
 ### Vérifier Ollama
@@ -95,11 +95,11 @@ docker system df -v | grep family-rag
 
 ```bash
 # Voir les erreurs
-docker-compose logs
+docker compose logs
 
 # Rebuild complet
-docker-compose down -v
-docker-compose up -d --build
+docker compose down -v
+docker compose up -d --build
 ```
 
 ### Ollama non connecté
@@ -182,9 +182,9 @@ curl http://localhost:11434/api/chat -d '{
 
 ```bash
 # Supprimer uniquement le volume d'index
-docker-compose down
+docker compose down
 docker volume rm family-rag-index
-docker-compose up -d
+docker compose up -d
 ```
 
 ---
@@ -194,14 +194,14 @@ docker-compose up -d
 ### Nettoyage léger (conserve l'image)
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Nettoyage complet
 
 ```bash
 # Tout supprimer (container + volume + image)
-docker-compose down -v --rmi local
+docker compose down -v --rmi local
 
 # Vérifier
 docker ps -a | grep family-rag
@@ -268,7 +268,7 @@ echo "Backup créé : $BACKUP_DIR"
 
 ```bash
 # Arrêter le service
-docker-compose down
+docker compose down
 
 # Supprimer l'ancien volume
 docker volume rm family-rag-index
@@ -295,8 +295,8 @@ docker-compose up -d
 git pull  # ou remplacer manuellement
 
 # Rebuild
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose up -d --build
 ```
 
 ### Mettre à jour les modèles Ollama
@@ -314,10 +314,10 @@ ollama pull mistral:latest
 
 | Action | Commande |
 |--------|----------|
-| Statut | `docker-compose ps` |
-| Logs | `docker-compose logs -f` |
+| Statut | `docker compose ps` |
+| Logs | `docker compose logs -f` |
 | Shell dans le container | `docker exec -it family-rag /bin/bash` |
-| Redémarrer | `docker-compose restart` |
+| Redémarrer | `docker compose restart` |
 | Stats ressources | `docker stats family-rag` |
 | Inspecter le volume | `docker volume inspect family-rag-index` |
 | Tester l'API | `curl http://localhost:8000/health` |
