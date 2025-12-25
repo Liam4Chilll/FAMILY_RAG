@@ -8,7 +8,7 @@ Référence rapide pour gérer, diagnostiquer et maintenir votre instance Family
 
 | Élément | Valeur |
 |---------|--------|
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Service | `family-rag` |
 | Container | `family-rag` |
 | Volume | `family-rag-index` |
