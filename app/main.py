@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Family RAG",
     description="Système RAG local pour la famille",
-    version="2.6.0",
+    version="2.6.2",
     lifespan=lifespan
 )
 
@@ -46,12 +46,14 @@ class QueryRequest(BaseModel):
     question: str
     top_k: Optional[int] = None
     image_data: Optional[str] = None  # Base64 encoded image
+    selected_sources: Optional[list[str]] = None  # Filtrage par sources
 
 
 class SettingsUpdate(BaseModel):
     temperature: Optional[float] = None
     top_k: Optional[int] = None
     llm_model: Optional[str] = None
+    embedding_model: Optional[str] = None
 
 
 class VisionRequest(BaseModel):
@@ -105,10 +107,21 @@ async def list_files():
 @app.post("/api/index")
 async def index_documents():
     """Indexe tous les documents."""
-    result = rag_engine.index_documents()
-    if not result['success']:
-        raise HTTPException(status_code=400, detail=result.get('error', 'Indexation échouée'))
-    return result
+    try:
+        result = rag_engine.index_documents()
+        if not result['success']:
+            raise HTTPException(status_code=400, detail=result.get('error', 'Indexation échouée'))
+        return result
+    except Exception as e:
+        # Capturer toutes les erreurs et retourner un JSON propre
+        error_message = str(e)
+        print(f"[API] Erreur indexation : {error_message}")
+        return {
+            'success': False,
+            'error': f"Erreur lors de l'indexation : {error_message}",
+            'documents': 0,
+            'chunks': 0
+        }
 
 
 @app.post("/api/query")
@@ -116,12 +129,32 @@ async def query(request: QueryRequest):
     """Exécute une requête RAG."""
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="La question ne peut pas être vide")
-    
-    result = rag_engine.query(request.question, request.top_k)
-    
+
+    # Créer le filtre de métadonnées si des sources sont sélectionnées
+    filter_metadata = None
+    if request.selected_sources and len(request.selected_sources) > 0:
+        filter_metadata = {'source': request.selected_sources}
+
+    result = rag_engine.query(
+        request.question,
+        request.top_k,
+        filter_metadata=filter_metadata
+    )
+
+    # Ajouter les chunks détaillés pour debug
+    chunks_preview = []
+    if result.sources:
+        for source in result.sources:
+            chunks_preview.append({
+                'source': source['source'],
+                'score': source['score'],
+                'content': source['preview']  # Déjà limité à 200 chars
+            })
+
     return {
         "answer": result.answer,
         "sources": result.sources,
+        "chunks_preview": chunks_preview,  # Pour debug
         "metrics": {
             "query_time_ms": result.query_time_ms,
             "chunks_found": result.chunks_found,
@@ -156,16 +189,26 @@ async def get_stats():
 @app.put("/api/settings")
 async def update_settings(settings: SettingsUpdate):
     """Met à jour les paramètres du moteur RAG."""
+    needs_reindex = False
+
+    # Vérifier si on change le modèle d'embedding
+    if settings.embedding_model is not None:
+        needs_reindex = rag_engine.update_embedding_model(settings.embedding_model)
+
+    # Mettre à jour les autres paramètres
     rag_engine.update_settings(
         temperature=settings.temperature,
         top_k=settings.top_k,
         llm_model=settings.llm_model
     )
+
     return {
         "status": "ok",
         "llm_model": rag_engine.settings.llm_model,
+        "embedding_model": rag_engine.settings.embedding_model,
         "temperature": rag_engine.settings.temperature,
-        "top_k": rag_engine.settings.top_k
+        "top_k": rag_engine.settings.top_k,
+        "needs_reindex": needs_reindex  # Indique si une ré-indexation est nécessaire
     }
 
 
@@ -173,7 +216,7 @@ async def update_settings(settings: SettingsUpdate):
 async def get_ollama_models():
     """Liste les modèles disponibles sur Ollama."""
     settings = get_settings()
-    
+
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -182,7 +225,7 @@ async def get_ollama_models():
             )
             response.raise_for_status()
             data = response.json()
-            
+
             return {
                 "models": [
                     {
@@ -192,6 +235,50 @@ async def get_ollama_models():
                     }
                     for m in data.get("models", [])
                 ]
+            }
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Impossible de contacter Ollama: {str(e)}"
+        )
+
+
+@app.get("/api/ollama/embedding-models")
+async def get_embedding_models():
+    """Liste les modèles d'embedding disponibles sur Ollama."""
+    settings = get_settings()
+
+    # Modèles d'embedding connus
+    EMBEDDING_MODELS = {
+        "nomic-embed-text", "nomic",
+        "mxbai-embed-large", "mxbai",
+        "snowflake-arctic-embed", "snowflake",
+        "all-minilm", "minilm",
+        "bge-", "gte-"
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{settings.ollama_base_url}/api/tags",
+                timeout=10.0
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            # Filtrer uniquement les modèles d'embedding
+            embedding_models = []
+            for m in data.get("models", []):
+                name = m["name"].lower()
+                if any(embed_name in name for embed_name in EMBEDDING_MODELS):
+                    embedding_models.append({
+                        "name": m["name"],
+                        "size": m.get("size", 0),
+                        "modified": m.get("modified_at", "")
+                    })
+
+            return {
+                "models": embedding_models
             }
     except httpx.RequestError as e:
         raise HTTPException(
