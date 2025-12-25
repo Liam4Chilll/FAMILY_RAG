@@ -17,6 +17,7 @@ from langchain.schema.runnable import RunnablePassthrough
 
 from config import get_settings
 from document_loader import DocumentLoader
+from structure_aware_splitter import StructureAwareSplitter
 
 
 @dataclass
@@ -127,13 +128,36 @@ class RAGEngine:
                 'chunks': 0
             }
         
-        # Découper en chunks
-        splitter = RecursiveCharacterTextSplitter(
+        # Découper en chunks avec le splitter intelligent
+        print("[Family RAG] Utilisation du StructureAwareSplitter pour préserver la structure des documents")
+        splitter = StructureAwareSplitter(
             chunk_size=self.settings.chunk_size,
             chunk_overlap=self.settings.chunk_overlap,
-            separators=["\n\n", "\n", ". ", " ", ""]
+            min_chunk_size=100,
+            max_chunk_size=1500  # Réduit à 1500 pour éviter dépassement limite embedding
         )
         chunks = splitter.split_documents(documents)
+        print(f"[Family RAG] {len(documents)} documents → {len(chunks)} chunks intelligents")
+
+        # Vérifier et limiter la taille des chunks pour l'embedding (sécurité)
+        # nomic-embed-text a une limite de ~2000 chars, on limite à 1500 par sécurité
+        safe_chunks = []
+        for chunk in chunks:
+            if len(chunk.page_content) > 1500:
+                print(f"[Family RAG] ⚠️ Chunk trop grand ({len(chunk.page_content)} chars), découpage...")
+                # Re-découper ce chunk avec le splitter fallback
+                fallback_splitter = RecursiveCharacterTextSplitter(
+                    chunk_size=1000,
+                    chunk_overlap=200,
+                    separators=["\n\n", "\n", ". ", " ", ""]
+                )
+                sub_chunks = fallback_splitter.split_documents([chunk])
+                safe_chunks.extend(sub_chunks)
+            else:
+                safe_chunks.append(chunk)
+
+        chunks = safe_chunks
+        print(f"[Family RAG] Après vérification : {len(chunks)} chunks finaux")
         
         if not chunks:
             return {
@@ -144,11 +168,31 @@ class RAGEngine:
             }
         
         # Créer l'index vectoriel
-        self.vectorstore = FAISS.from_documents(chunks, self.embeddings)
-        self._save_index()
-        
+        try:
+            self.vectorstore = FAISS.from_documents(chunks, self.embeddings)
+            self._save_index()
+        except Exception as e:
+            error_msg = str(e)
+            print(f"[Family RAG] ❌ Erreur création index FAISS : {error_msg}")
+
+            # Message plus clair pour l'utilisateur
+            if "exceeds the context length" in error_msg:
+                return {
+                    'success': False,
+                    'error': 'Certains documents sont trop longs pour le modèle d\'embedding. Essayez de diviser vos documents en fichiers plus petits.',
+                    'documents': len(documents),
+                    'chunks': len(chunks)
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': f'Erreur lors de la création de l\'index : {error_msg}',
+                    'documents': len(documents),
+                    'chunks': len(chunks)
+                }
+
         elapsed = time.time() - start_time
-        
+
         return {
             'success': True,
             'documents': len(documents),
@@ -156,7 +200,90 @@ class RAGEngine:
             'time_seconds': round(elapsed, 2)
         }
     
-    def query(self, question: str, top_k: Optional[int] = None) -> QueryResult:
+    def _rerank_chunks(self, question: str, docs_with_scores: List, target_k: int) -> List:
+        """Re-classe les chunks avec le LLM pour améliorer la pertinence sémantique.
+
+        Args:
+            question: La question de l'utilisateur
+            docs_with_scores: Liste de tuples (Document, score) depuis FAISS
+            target_k: Nombre final de chunks à retourner après re-ranking
+
+        Returns:
+            Liste de tuples (Document, nouveau_score) re-classés par pertinence
+        """
+        if not docs_with_scores or not self.llm:
+            return docs_with_scores
+
+        # Préparer le prompt de scoring
+        rerank_prompt = ChatPromptTemplate.from_template("""Tu es un expert en évaluation de pertinence de documents.
+
+Ta tâche : Évaluer la pertinence de chaque extrait de document par rapport à la question.
+
+QUESTION : {question}
+
+EXTRAIT {index} :
+{chunk}
+
+INSTRUCTIONS :
+1. Lis attentivement l'extrait
+2. Détermine s'il contient des informations DIRECTEMENT utiles pour répondre à la question
+3. Donne un score de 0 à 10 :
+   - 10 = Répond EXACTEMENT à la question avec détails précis
+   - 7-9 = Informations très pertinentes et utiles
+   - 4-6 = Informations partiellement pertinentes
+   - 1-3 = Vaguement lié au sujet
+   - 0 = Hors-sujet complet
+
+Réponds UNIQUEMENT avec un nombre entre 0 et 10, sans explication.""")
+
+        # Scorer chaque chunk
+        reranked = []
+        for idx, (doc, original_score) in enumerate(docs_with_scores):
+            try:
+                # Limiter la taille du chunk pour le scoring (économie de tokens)
+                chunk_preview = doc.page_content[:1500] if len(doc.page_content) > 1500 else doc.page_content
+
+                # Demander au LLM de scorer
+                chain = rerank_prompt | self.llm
+                response = chain.invoke({
+                    "question": question,
+                    "chunk": chunk_preview,
+                    "index": idx + 1
+                })
+
+                # Extraire le score (parser la réponse)
+                score_text = response.content.strip()
+                # Tenter d'extraire un nombre
+                import re
+                match = re.search(r'(\d+(?:\.\d+)?)', score_text)
+                if match:
+                    llm_score = float(match.group(1))
+                    # Normaliser entre 0 et 1
+                    llm_score = min(10.0, max(0.0, llm_score)) / 10.0
+                else:
+                    # Si parsing échoue, garder score FAISS normalisé
+                    llm_score = 1.0 / (1.0 + original_score)  # Convertir distance en similarité
+
+                reranked.append((doc, llm_score))
+
+            except Exception as e:
+                # En cas d'erreur, garder le score FAISS
+                print(f"[Re-ranking] Erreur sur chunk {idx}: {e}")
+                reranked.append((doc, 1.0 / (1.0 + original_score)))
+
+        # Trier par score décroissant
+        reranked.sort(key=lambda x: x[1], reverse=True)
+
+        # Retourner les top_k meilleurs
+        return reranked[:target_k]
+
+    def query(
+        self,
+        question: str,
+        top_k: Optional[int] = None,
+        enable_reranking: bool = True,
+        filter_metadata: Optional[dict] = None
+    ) -> QueryResult:
         """Exécute une requête RAG."""
         if not self.llm or not self.settings.llm_model:
             return QueryResult(
@@ -178,10 +305,19 @@ class RAGEngine:
         
         start_time = time.time()
         k = top_k or self.settings.top_k
-        
-        # Recherche des chunks pertinents
-        docs_with_scores = self.vectorstore.similarity_search_with_score(question, k=k)
-        
+
+        # Recherche des chunks pertinents avec FAISS
+        # Si filtrage activé, récupérer plus de résultats pour compenser le filtrage
+        # Si re-ranking activé, récupérer 2x plus de chunks pour avoir plus de choix
+        if filter_metadata:
+            initial_k = k * 4  # Plus de résultats pour le filtrage
+        elif enable_reranking:
+            initial_k = k * 2
+        else:
+            initial_k = k
+
+        docs_with_scores = self.vectorstore.similarity_search_with_score(question, k=initial_k)
+
         if not docs_with_scores:
             return QueryResult(
                 answer="Aucun document pertinent trouvé pour cette question.",
@@ -190,6 +326,61 @@ class RAGEngine:
                 chunks_found=0,
                 model_used=self.settings.llm_model
             )
+
+        # Filtrage par métadonnées si spécifié
+        if filter_metadata:
+            filtered_docs = []
+            for doc, score in docs_with_scores:
+                # Vérifier si le document correspond aux critères
+                matches = True
+                for key, value in filter_metadata.items():
+                    doc_value = doc.metadata.get(key)
+                    if doc_value is None:
+                        matches = False
+                        break
+                    # Support pour plusieurs types de comparaisons
+                    if isinstance(value, list):  # Valeur dans une liste
+                        if doc_value not in value:
+                            matches = False
+                            break
+                    elif isinstance(value, dict):  # Comparaisons avancées (ex: year >= 2020)
+                        if 'gte' in value and doc_value < value['gte']:
+                            matches = False
+                            break
+                        if 'lte' in value and doc_value > value['lte']:
+                            matches = False
+                            break
+                        if 'eq' in value and doc_value != value['eq']:
+                            matches = False
+                            break
+                    else:  # Égalité simple
+                        if doc_value != value:
+                            matches = False
+                            break
+
+                if matches:
+                    filtered_docs.append((doc, score))
+
+            docs_with_scores = filtered_docs[:initial_k]
+            print(f"[RAG] Filtrage métadonnées : {len(filtered_docs)} chunks correspondent aux critères {filter_metadata}")
+
+            if not docs_with_scores:
+                return QueryResult(
+                    answer=f"Aucun document trouvé correspondant aux critères : {filter_metadata}",
+                    sources=[],
+                    query_time_ms=0,
+                    chunks_found=0,
+                    model_used=self.settings.llm_model
+                )
+
+        # Re-ranking avec LLM si activé
+        if enable_reranking and len(docs_with_scores) > k:
+            print(f"[RAG] Re-ranking {len(docs_with_scores)} chunks → top {k}")
+            docs_with_scores = self._rerank_chunks(question, docs_with_scores, k)
+        else:
+            # Limiter au top_k si pas de re-ranking
+            docs_with_scores = docs_with_scores[:k]
+            print(f"[RAG] Utilisation de {len(docs_with_scores)} chunks")
         
         # Préparer le contexte
         context_parts = []
@@ -205,17 +396,37 @@ class RAGEngine:
         
         context = "\n\n---\n\n".join(context_parts)
         
-        # Prompt RAG
-        prompt = ChatPromptTemplate.from_template("""Tu es un assistant qui répond aux questions en te basant uniquement sur le contexte fourni.
-Si le contexte ne contient pas l'information nécessaire, dis-le clairement.
-Réponds en français de manière concise et précise.
+        # Prompt RAG amélioré
+        prompt = ChatPromptTemplate.from_template("""Tu es un assistant familial qui répond aux questions en te basant UNIQUEMENT sur les extraits de documents fournis.
 
-Contexte:
+PRINCIPES DE RÉPONSE :
+
+1. PRÉCISION ET SOURCES
+- Base-toi UNIQUEMENT sur les informations présentes dans le contexte
+- Si une information N'EST PAS dans le contexte, dis clairement "Cette information n'est pas présente dans les documents"
+- Cite la source entre crochets [nom_fichier] pour chaque affirmation factuelle
+
+2. EFFICACITÉ
+- Réponds de manière concise et précise
+- Va droit au but sans sur-développer
+- Structure ta réponse clairement (listes à puces si pertinent)
+
+3. VÉRIFICATION
+- Relis le contexte avant de répondre
+- Vérifie que chaque fait mentionné est bien sourcé
+- N'invente RIEN, n'extrapole PAS
+
+4. CLARTÉ
+- Utilise un langage simple et direct
+- Si plusieurs sources mentionnent des informations différentes, note-le clairement
+- En cas d'ambiguïté, demande des précisions
+
+CONTEXTE (Extraits de documents) :
 {context}
 
-Question: {question}
+QUESTION : {question}
 
-Réponse:""")
+RÉPONSE (avec citations des sources) :""")
         
         # Générer la réponse
         chain = prompt | self.llm
@@ -279,7 +490,43 @@ Réponse:""")
         
         if top_k is not None:
             self.settings.top_k = top_k
-    
+
+    def update_embedding_model(self, embedding_model: str) -> bool:
+        """
+        Met à jour le modèle d'embedding.
+        Retourne True si une ré-indexation est nécessaire.
+        """
+        # Vérifier si le modèle a vraiment changé
+        if embedding_model == self.settings.embedding_model:
+            return False  # Pas besoin de ré-indexer
+
+        print(f"[RAG] Changement de modèle d'embedding : {self.settings.embedding_model} → {embedding_model}")
+
+        # Mettre à jour le modèle dans les settings
+        self.settings.embedding_model = embedding_model
+
+        # Reconstruire l'objet OllamaEmbeddings avec le nouveau modèle
+        self.embeddings = OllamaEmbeddings(
+            model=embedding_model,
+            base_url=self.settings.ollama_base_url
+        )
+
+        # Supprimer l'index existant car il n'est plus valide
+        # (les embeddings ont changé de dimension/sémantique)
+        if self.index_path.exists():
+            print(f"[RAG] Suppression de l'ancien index (incompatible avec le nouveau modèle d'embedding)")
+            try:
+                import shutil
+                shutil.rmtree(self.index_path)
+            except Exception as e:
+                print(f"[RAG] Erreur lors de la suppression de l'index : {e}")
+
+        # Réinitialiser le vectorstore
+        self.vectorstore = None
+
+        # Retourner True pour indiquer qu'une ré-indexation est nécessaire
+        return True
+
     async def analyze_image_with_vision(self, image_path: str, question: str) -> dict:
         """Analyse une image avec un modèle vision (Ministral 3)."""
         start_time = time.time()
