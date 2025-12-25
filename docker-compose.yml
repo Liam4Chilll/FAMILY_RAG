@@ -5,17 +5,13 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Remplacer par le chemin absolu vers votre dossier de documents
-      # Exemple macOS : /Users/liam4chill/RAG:/data
-      # Exemple Linux : /home/liam4chill/RAG:/data
-      - /Users/liam4chill/RAG:/data
+      - ${HOST_DATA_PATH:?Définir HOST_DATA_PATH dans .env}:/data
       - family-rag-index:/app/index
     environment:
-      - OLLAMA_HOST=host.docker.internal:11434
-      - EMBEDDING_MODEL=nomic-embed-text
-      # LLM_MODEL est auto-détecté parmi les modèles Ollama disponibles
-      - CHUNK_SIZE=1000
-      - CHUNK_OVERLAP=200
+      - OLLAMA_HOST=${OLLAMA_HOST:-host.docker.internal:11434}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text}
+      - CHUNK_SIZE=${CHUNK_SIZE:-1200}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-300}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
