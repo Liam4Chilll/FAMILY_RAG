@@ -1,11 +1,13 @@
 """Chargement et parsing des documents multi-formats."""
 
 import os
+import re
 import email
 import chardet
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 from dataclasses import dataclass
+from datetime import datetime
 
 from langchain.schema import Document
 from pypdf import PdfReader
@@ -51,26 +53,163 @@ class DocumentLoader:
                 })
         
         return sorted(files, key=lambda x: x['name'].lower())
-    
+
+    def _extract_date(self, content: str, file_path: Path) -> Optional[str]:
+        """Extrait une date du contenu ou du nom de fichier.
+
+        Recherche des patterns de dates dans le contenu et le nom de fichier.
+        Retourne la date au format ISO (YYYY-MM-DD) ou None.
+        """
+        # Pattern de dates courants
+        date_patterns = [
+            r'(\d{4}[-/]\d{2}[-/]\d{2})',  # YYYY-MM-DD ou YYYY/MM/DD
+            r'(\d{2}[-/]\d{2}[-/]\d{4})',  # DD-MM-YYYY ou DD/MM/YYYY
+            r'(\d{1,2}\s+(?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+\d{4})',  # FR
+            r'(\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+\d{4})',  # EN
+        ]
+
+        # Chercher dans le nom de fichier d'abord
+        filename = file_path.stem
+        for pattern in date_patterns[:2]:  # Uniquement formats numériques pour filename
+            match = re.search(pattern, filename, re.IGNORECASE)
+            if match:
+                date_str = match.group(1)
+                try:
+                    # Normaliser au format ISO
+                    if '/' in date_str or '-' in date_str:
+                        parts = re.split(r'[-/]', date_str)
+                        if len(parts[0]) == 4:  # YYYY-MM-DD
+                            return f"{parts[0]}-{parts[1]}-{parts[2]}"
+                        else:  # DD-MM-YYYY
+                            return f"{parts[2]}-{parts[1]}-{parts[0]}"
+                except:
+                    pass
+
+        # Chercher dans le contenu (premières 500 lignes)
+        content_preview = content[:5000] if len(content) > 5000 else content
+        for pattern in date_patterns:
+            match = re.search(pattern, content_preview, re.IGNORECASE)
+            if match:
+                return match.group(1)
+
+        # Dernière option : date de modification du fichier
+        try:
+            mtime = file_path.stat().st_mtime
+            return datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')
+        except:
+            return None
+
+    def _extract_year(self, file_path: Path, content: str = "") -> Optional[int]:
+        """Extrait l'année du nom de fichier ou du contenu."""
+        # Chercher année dans le nom de fichier
+        filename = file_path.stem
+        year_match = re.search(r'(20\d{2}|19\d{2})', filename)
+        if year_match:
+            return int(year_match.group(1))
+
+        # Chercher dans le contenu
+        if content:
+            content_preview = content[:1000]
+            year_match = re.search(r'(20\d{2}|19\d{2})', content_preview)
+            if year_match:
+                return int(year_match.group(1))
+
+        # Année de modification du fichier
+        try:
+            mtime = file_path.stat().st_mtime
+            return datetime.fromtimestamp(mtime).year
+        except:
+            return None
+
+    def _classify_document(self, content: str) -> str:
+        """Classifie le type de document selon son contenu.
+
+        Types possibles : contrat, recette, email, facture, note, autre
+        """
+        content_lower = content.lower()[:2000]  # Analyser le début
+
+        # Mots-clés par catégorie
+        keywords = {
+            'contrat': ['contrat', 'partie', 'signataire', 'article', 'clause', 'conditions générales', 'prêt', 'emprunt'],
+            'recette': ['ingrédients', 'recette', 'cuisson', 'préparation', 'four', 'ml', 'grammes', 'servir'],
+            'facture': ['facture', 'montant', 'ttc', 'tva', 'total', 'paiement', 'numéro de facture'],
+            'email': ['objet:', 'de:', 'à:', 'sujet:', 'from:', 'to:', 'subject:'],
+            'formulaire': ['formulaire', 'nom:', 'prénom:', 'adresse:', 'date de naissance', 'signature'],
+            'note': ['note', 'mémo', 'remarque', 'à faire', 'todo', 'rappel'],
+        }
+
+        # Compter les occurrences
+        scores = {}
+        for doc_type, words in keywords.items():
+            score = sum(1 for word in words if word in content_lower)
+            scores[doc_type] = score
+
+        # Retourner le type avec le meilleur score
+        if max(scores.values()) > 0:
+            return max(scores, key=scores.get)
+        return 'autre'
+
+    def _extract_author(self, content: str) -> Optional[str]:
+        """Extrait l'auteur/expéditeur du document."""
+        content_preview = content[:1000]
+
+        # Patterns pour extraire l'auteur
+        patterns = [
+            r'(?:De|From):\s*([^\n<]+)',  # Email
+            r'(?:Auteur|Author):\s*([^\n]+)',  # Document
+            r'(?:Par|By):\s*([^\n]+)',  # Note
+            r'(?:Signé|Signed):\s*([^\n]+)',  # Contrat
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, content_preview, re.IGNORECASE)
+            if match:
+                author = match.group(1).strip()
+                # Nettoyer (enlever email entre <>)
+                author = re.sub(r'<[^>]+>', '', author).strip()
+                if author:
+                    return author[:100]  # Limiter la longueur
+
+        return None
+
     def load_all(self) -> List[Document]:
-        """Charge tous les documents du dossier data."""
+        """Charge tous les documents du dossier data avec métadonnées enrichies."""
         documents = []
-        
+
         for file_info in self.list_files():
             file_path = self.data_dir / file_info['path']
             loaded = self._load_file(file_path)
-            
+
             if loaded.content and not loaded.error:
+                # Extraire métadonnées enrichies
+                doc_date = self._extract_date(loaded.content, file_path)
+                doc_year = self._extract_year(file_path, loaded.content)
+                doc_type = self._classify_document(loaded.content)
+                doc_author = self._extract_author(loaded.content)
+
+                # Créer le document avec métadonnées complètes
+                metadata = {
+                    'source': loaded.filename,
+                    'file_type': loaded.file_type,
+                    'size_bytes': loaded.size_bytes,
+                    'date': doc_date,
+                    'year': doc_year,
+                    'doc_type': doc_type,
+                    'author': doc_author
+                }
+
+                # Supprimer les None pour alléger
+                metadata = {k: v for k, v in metadata.items() if v is not None}
+
                 doc = Document(
                     page_content=loaded.content,
-                    metadata={
-                        'source': loaded.filename,
-                        'file_type': loaded.file_type,
-                        'size_bytes': loaded.size_bytes
-                    }
+                    metadata=metadata
                 )
                 documents.append(doc)
-        
+
+                # Log des métadonnées extraites
+                print(f"[Loader] {loaded.filename} → type:{doc_type}, année:{doc_year}, auteur:{doc_author or 'N/A'}")
+
         return documents
     
     def _load_file(self, file_path: Path) -> LoadedDocument:
