@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     llm_model: str = ""  # Auto-détecté au démarrage si vide
     
     # RAG
-    chunk_size: int = 1000
-    chunk_overlap: int = 200
-    top_k: int = 4
+    chunk_size: int = 1200  # Augmenté pour capturer plus de contexte (expériences complètes)
+    chunk_overlap: int = 300  # Réduit pour éviter trop de redondance
+    top_k: int = 12  # Augmenté pour récupérer plus de chunks pertinents
     
     # LLM
     temperature: float = 0.7
