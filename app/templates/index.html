@@ -7,64 +7,57 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        /* Themes */
-        :root, [data-theme="darkpro"] {
-            --accent-400: #38bdf8; --accent-500: #0ea5e9; --accent-600: #0284c7; --accent-700: #0369a1;
-            --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-tertiary: #334155;
-            --border-color: #475569; --text-primary: #f1f5f9; --text-secondary: #94a3b8;
+        /* === THEMES === */
+        :root, [data-theme="midnight"] {
+            --accent-400: #3b82f6; --accent-500: #2563eb; --accent-600: #1d4ed8; --accent-700: #1e40af;
+            --bg-primary: #0a1628; --bg-secondary: #0f1f3a; --bg-tertiary: #152845;
+            --border-color: #1e3a5f; --text-primary: #ffffff; --text-secondary: #94a3b8;
         }
-        [data-theme="ocean"] {
-            --accent-400: #22d3ee; --accent-500: #06b6d4; --accent-600: #0891b2; --accent-700: #0e7490;
-            --bg-primary: #042f2e; --bg-secondary: #134e4a; --bg-tertiary: #115e59;
-            --border-color: #2dd4bf; --text-primary: #f0fdfa; --text-secondary: #5eead4;
+        [data-theme="cyber"] {
+            --accent-400: #22d3ee; --accent-500: #00d4ff; --accent-600: #0891b2; --accent-700: #0e7490;
+            --bg-primary: #000000; --bg-secondary: #0a0a0a; --bg-tertiary: #141414;
+            --border-color: #00d4ff; --text-primary: #ffffff; --text-secondary: #64748b;
         }
-        [data-theme="forest"] {
-            --accent-400: #4ade80; --accent-500: #22c55e; --accent-600: #16a34a; --accent-700: #15803d;
-            --bg-primary: #0c1a0f; --bg-secondary: #14291a; --bg-tertiary: #1a3a22;
-            --border-color: #22543d; --text-primary: #ecfdf5; --text-secondary: #6ee7b7;
+        [data-theme="tactical"] {
+            --accent-400: #ff6666; --accent-500: #ff3333; --accent-600: #dc2626; --accent-700: #b91c1c;
+            --bg-primary: #1a2e1a; --bg-secondary: #253825; --bg-tertiary: #2d442d;
+            --border-color: #3d5a3d; --text-primary: #ffffff; --text-secondary: #86a386;
         }
-        [data-theme="amber"] {
-            --accent-400: #fbbf24; --accent-500: #f59e0b; --accent-600: #d97706; --accent-700: #b45309;
-            --bg-primary: #1c1410; --bg-secondary: #292017; --bg-tertiary: #3d2e1e;
-            --border-color: #78350f; --text-primary: #fef3c7; --text-secondary: #fcd34d;
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
         }
-        [data-theme="mono"] {
-            --accent-400: #a1a1aa; --accent-500: #71717a; --accent-600: #52525b; --accent-700: #3f3f46;
-            --bg-primary: #09090b; --bg-secondary: #18181b; --bg-tertiary: #27272a;
-            --border-color: #3f3f46; --text-primary: #fafafa; --text-secondary: #a1a1aa;
-        }
-        [data-theme="family"] {
-            --accent-400: #e879f9; --accent-500: #d946ef; --accent-600: #c026d3; --accent-700: #a21caf;
-            --bg-primary: #1a0a1e; --bg-secondary: #2d1533; --bg-tertiary: #4a1d54;
-            --border-color: #701a75; --text-primary: #fae8ff; --text-secondary: #e879f9;
-        }
-        
-        body { background-color: var(--bg-primary); color: var(--text-primary); overflow-x: hidden; }
         .bg-card { background-color: var(--bg-secondary); }
         .bg-elevated { background-color: var(--bg-tertiary); }
         .border-themed { border-color: var(--border-color); }
         .text-muted { color: var(--text-secondary); }
         .gradient-accent { background: linear-gradient(135deg, var(--accent-500), var(--accent-700)); }
         .text-accent { color: var(--accent-400); }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
+
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        
-        /* Range slider */
-        input[type="range"] { -webkit-appearance: none; height: 6px; background: var(--bg-tertiary); border-radius: 3px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: linear-gradient(135deg, var(--accent-500), var(--accent-700)); border-radius: 50%; cursor: pointer; }
-        
-        /* Animations */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-slideIn { animation: slideIn 0.3s ease-out forwards; }
-        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        [x-cloak] { display: none !important; }
-        
-        /* Floating shapes background */
+        ::-webkit-scrollbar-thumb { background: var(--accent-500); border-radius: 3px; }
+
+        /* === RANGE SLIDER === */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, var(--accent-500), var(--accent-700));
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-500);
+        }
+
+        /* === FLOATING SHAPES (ENHANCED) === */
         .floating-shapes {
             position: fixed;
             top: 0;
@@ -77,460 +70,554 @@
         }
         .shape {
             position: absolute;
-            opacity: 0.06;
-            border: 2px solid var(--accent-500);
-        }
-        .shape-hexagon {
-            width: 120px;
-            height: 69px;
-            background: transparent;
-            position: relative;
-        }
-        .shape-hexagon:before,
-        .shape-hexagon:after {
-            content: "";
-            position: absolute;
-            width: 0;
-            border-left: 60px solid transparent;
-            border-right: 60px solid transparent;
-        }
-        .shape-hexagon:before {
-            bottom: 100%;
-            border-bottom: 35px solid var(--accent-500);
-        }
-        .shape-hexagon:after {
-            top: 100%;
-            border-top: 35px solid var(--accent-500);
+            opacity: 0.20;
+            border: 3px solid var(--accent-500);
+            filter: drop-shadow(0 0 10px var(--accent-500));
         }
         .shape-diamond {
-            width: 80px;
-            height: 80px;
-            transform: rotate(45deg);
-            border-radius: 8px;
-        }
-        .shape-circle {
             width: 100px;
             height: 100px;
+            transform: rotate(45deg);
+            border-radius: 10px;
+            background: radial-gradient(circle at center, transparent 40%, var(--accent-500) 100%);
+        }
+        .shape-circle {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
+            background: radial-gradient(circle at center, transparent 50%, var(--accent-500) 100%);
         }
         .shape-triangle {
             width: 0;
             height: 0;
-            border-left: 50px solid transparent;
-            border-right: 50px solid transparent;
-            border-bottom: 87px solid var(--accent-500);
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 104px solid var(--accent-500);
             background: transparent;
-            border-top: none;
+            filter: drop-shadow(0 0 15px var(--accent-500));
         }
-        
-        /* Drag and drop zone */
+
+        /* === ANIMATIONS === */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px var(--accent-500); }
+            50% { box-shadow: 0 0 20px var(--accent-500), 0 0 30px var(--accent-600); }
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: var(--border-color); }
+            50% { border-color: var(--accent-500); }
+        }
+
+        .animate-slideIn { animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-glow { animation: glow 2s ease-in-out infinite; }
+        .animate-pulse-border { animation: pulse-border 2s ease-in-out infinite; }
+
+        /* Hover effects */
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        [x-cloak] { display: none !important; }
+
+        /* === COMPACT LAYOUT === */
+        .compact-padding { padding: 0.75rem; }
+        .compact-gap { gap: 0.5rem; }
+
+        /* === MESSAGE METRICS === */
+        .message-metrics {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* === SIDEBAR === */
+        .sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            z-index: 40;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* === SOURCE SELECTION === */
+        .source-checkbox {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-elevated);
+            transition: all 0.2s ease;
+        }
+        .source-checkbox:checked {
+            background: var(--accent-500);
+            border-color: var(--accent-500);
+        }
+        .source-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* === DRAG AND DROP === */
         .drop-zone {
             transition: all 0.3s ease;
         }
         .drop-zone.drag-over {
             border-color: var(--accent-500) !important;
-            background-color: rgba(from var(--accent-500) r g b / 0.1);
+            background-color: var(--bg-tertiary);
+            box-shadow: 0 0 20px rgba(from var(--accent-500) r g b / 0.3);
         }
-        @supports not (background-color: rgba(from red r g b / 0.5)) {
-            .drop-zone.drag-over { background-color: var(--bg-tertiary); }
-        }
-        
-        /* Image preview */
+
+        /* === IMAGE PREVIEW === */
         .image-preview {
-            max-width: 200px;
-            max-height: 150px;
+            max-width: 150px;
+            max-height: 100px;
             object-fit: contain;
             border-radius: 8px;
         }
-        
-        /* Stop button pulse */
-        @keyframes pulse-red {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-        }
-        .animate-pulse-red { animation: pulse-red 1.5s infinite; }
     </style>
 </head>
 <body class="min-h-screen relative">
-    
+
     <!-- Floating Background Shapes -->
     <div class="floating-shapes" id="floating-bg"></div>
-    
-    <div x-data="ragApp()" x-init="init()" class="container mx-auto px-4 py-8 max-w-6xl relative z-10">
-        
-        <!-- Header -->
-        <header class="mb-8">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 gradient-accent rounded-xl flex items-center justify-center shadow-lg animate-float">
-                            <span class="text-2xl">🏠</span>
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2" x-show="ollamaConnected" style="border-color: var(--bg-primary)"></div>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold text-accent">Family RAG</h1>
-                        <p class="text-muted mt-1">Votre bibliothèque numérique privée</p>
-                    </div>
+
+    <div x-data="ragApp()" x-init="init()" class="relative z-10">
+
+        <!-- Sidebar History -->
+        <div class="sidebar" :class="{'open': sidebarOpen}">
+            <div class="flex flex-col h-full">
+                <!-- Sidebar Header -->
+                <div class="flex items-center justify-between compact-padding border-b border-themed">
+                    <h3 class="font-semibold flex items-center gap-2">
+                        <span>💬</span> Conversations
+                    </h3>
+                    <button @click="sidebarOpen = false" class="text-muted hover:text-white">✕</button>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span x-show="visionAvailable" class="flex items-center gap-2 bg-card px-3 py-2 rounded-lg border border-themed">
-                        <span class="text-lg">👁️</span>
-                        <span class="text-sm text-muted">Vision</span>
-                    </span>
-                    <span class="flex items-center gap-2 bg-card px-3 py-2 rounded-lg border border-themed">
-                        <span class="relative flex h-3 w-3">
-                            <span :class="ollamaConnected ? 'bg-green-400' : 'bg-red-400'" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
-                            <span :class="ollamaConnected ? 'bg-green-500' : 'bg-red-500'" class="relative inline-flex rounded-full h-3 w-3"></span>
-                        </span>
-                        <span class="text-sm text-muted" x-text="ollamaConnected ? 'Ollama' : 'Déconnecté'"></span>
-                    </span>
+
+                <!-- New Conversation Button -->
+                <div class="compact-padding border-b border-themed">
+                    <button @click="newConversation()" class="w-full gradient-accent text-white compact-padding rounded-lg font-medium hover-lift flex items-center justify-center gap-2">
+                        <span>➕</span> Nouvelle conversation
+                    </button>
+                </div>
+
+                <!-- Conversations List -->
+                <div class="flex-1 overflow-y-auto p-2">
+                    <template x-for="(conv, index) in conversations" :key="conv.id">
+                        <div @click="loadConversation(conv.id)"
+                             :class="currentConversationId === conv.id ? 'bg-elevated border-accent' : 'bg-card border-themed hover:border-accent'"
+                             class="mb-2 compact-padding rounded-lg border transition-all hover-lift animate-slideIn"
+                             :style="'animation-delay: ' + (index * 0.05) + 's'">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium truncate flex-1" x-text="conv.title"></span>
+                                <button @click.stop.prevent="deleteConversation(conv.id)" class="text-muted hover:text-red-400 text-base flex-shrink-0 ml-2 px-1 hover:scale-125 transition-transform">🗑️</button>
+                            </div>
+                            <div class="text-xs text-muted flex items-center gap-2">
+                                <span x-text="conv.messages?.length || 0"></span> messages
+                                <span>•</span>
+                                <span x-text="formatTime(conv.timestamp)"></span>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="conversations.length === 0" class="text-center text-muted py-8">
+                        <p class="text-sm">Aucune conversation</p>
+                    </div>
                 </div>
             </div>
-        </header>
+        </div>
 
-        <!-- Navigation -->
-        <nav class="flex gap-1 mb-6 bg-card/50 backdrop-blur p-1.5 rounded-xl w-fit border border-themed">
-            <button @click="activeTab = 'chat'" :class="activeTab === 'chat' ? 'gradient-accent text-white shadow-lg' : 'text-muted hover:text-white hover:bg-elevated'" class="px-5 py-2.5 rounded-lg transition-all font-medium flex items-center gap-2">
-                <span>💬</span> Chat
-            </button>
-            <button @click="activeTab = 'documents'" :class="activeTab === 'documents' ? 'gradient-accent text-white shadow-lg' : 'text-muted hover:text-white hover:bg-elevated'" class="px-5 py-2.5 rounded-lg transition-all font-medium flex items-center gap-2">
-                <span>📁</span> Documents
-            </button>
-            <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'gradient-accent text-white shadow-lg' : 'text-muted hover:text-white hover:bg-elevated'" class="px-5 py-2.5 rounded-lg transition-all font-medium flex items-center gap-2">
-                <span>⚙️</span> Paramètres
-            </button>
-        </nav>
+        <!-- Main Container -->
+        <div class="container mx-auto px-3 py-4 max-w-7xl" style="margin-right: 280px;">
 
-        <!-- Chat Tab -->
-        <div x-show="activeTab === 'chat'" x-cloak x-transition>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed">
+            <!-- Header -->
+            <header class="mb-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 gradient-accent rounded-lg flex items-center justify-center shadow-lg animate-glow">
+                            <span class="text-xl">🏠</span>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-accent">Family RAG</h1>
+                            <p class="text-muted text-sm">v2.6.2</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span x-show="visionAvailable" class="flex items-center gap-2 bg-card compact-padding rounded-lg border border-themed">
+                            <span class="text-sm">👁️</span>
+                            <span class="text-xs text-muted">Vision</span>
+                        </span>
+                        <button @click="sidebarOpen = !sidebarOpen" class="bg-card compact-padding rounded-lg border border-themed hover:border-accent transition-all">
+                            <span class="text-lg">💬</span>
+                        </button>
+                        <span class="flex items-center gap-2 bg-card compact-padding rounded-lg border border-themed">
+                            <span class="relative flex h-2 w-2">
+                                <span :class="ollamaConnected ? 'bg-green-400' : 'bg-red-400'" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                                <span :class="ollamaConnected ? 'bg-green-500' : 'bg-red-500'" class="relative inline-flex rounded-full h-2 w-2"></span>
+                            </span>
+                            <span class="text-xs text-muted" x-text="ollamaConnected ? 'Ollama' : 'Off'"></span>
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="flex gap-1 mb-4 bg-card/50 backdrop-blur p-1 rounded-lg w-fit border border-themed">
+                <button @click="activeTab = 'chat'" :class="activeTab === 'chat' ? 'gradient-accent text-white shadow-lg' : 'text-muted hover:text-white hover:bg-elevated'" class="px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2 text-sm">
+                    <span>💬</span> Chat
+                </button>
+                <button @click="activeTab = 'documents'" :class="activeTab === 'documents' ? 'gradient-accent text-white shadow-lg' : 'text-muted hover:text-white hover:bg-elevated'" class="px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2 text-sm">
+                    <span>📁</span> Documents
+                </button>
+                <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'gradient-accent text-white shadow-lg' : 'text-muted hover:text-white hover:bg-elevated'" class="px-4 py-2 rounded-lg transition-all font-medium flex items-center gap-2 text-sm">
+                    <span>⚙️</span> Paramètres
+                </button>
+            </nav>
+
+            <!-- Chat Tab -->
+            <div x-show="activeTab === 'chat'" x-cloak x-transition>
+                <!-- Source Selection -->
+                <div x-show="showSourceSelection" x-transition class="mb-4 bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed animate-fadeIn">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-sm flex items-center gap-2">
+                            <span>🎯</span> Sélection des sources
+                        </h3>
+                        <div class="flex gap-2">
+                            <button @click="selectAllSources()" class="text-xs text-accent hover:underline">Tout sélectionner</button>
+                            <button @click="deselectAllSources()" class="text-xs text-muted hover:text-white">Tout désélectionner</button>
+                            <button @click="showSourceSelection = false" class="text-muted hover:text-white">✕</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
+                        <template x-for="file in files" :key="file.path">
+                            <label class="flex items-center gap-2 bg-elevated compact-padding rounded border border-themed hover:border-accent transition-all hover-lift">
+                                <input type="checkbox" x-model="selectedSources" :value="file.name" class="source-checkbox">
+                                <span class="text-xs truncate" x-text="file.name"></span>
+                            </label>
+                        </template>
+                    </div>
+                    <p class="text-xs text-muted mt-2" x-text="selectedSources.length + ' source(s) sélectionnée(s)'"></p>
+                </div>
+
+                <div class="bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed">
                     <!-- Messages -->
-                    <div class="h-96 overflow-y-auto mb-4 space-y-4" id="chat-messages">
+                    <div class="h-96 overflow-y-auto mb-3 space-y-2" id="chat-messages">
                         <template x-for="(msg, index) in messages" :key="index">
-                            <div :class="msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'">
-                                <div :class="msg.type === 'user' ? 'gradient-accent text-white' : 'bg-elevated'" class="max-w-[80%] rounded-2xl px-4 py-3 shadow-lg">
-                                    <!-- Image preview if present -->
+                            <div :class="msg.type === 'user' ? 'flex justify-end' : 'flex justify-start'" class="animate-fadeIn">
+                                <div :class="msg.type === 'user' ? 'gradient-accent text-white' : 'bg-elevated'" class="max-w-[80%] rounded-lg compact-padding shadow-lg hover-lift">
                                     <template x-if="msg.image">
-                                        <img :src="msg.image" class="image-preview mb-2" alt="Image uploadée">
+                                        <img :src="msg.image" class="max-w-[150px] max-h-[100px] object-contain rounded mb-2" alt="Image">
                                     </template>
-                                    <p class="whitespace-pre-wrap" x-text="msg.content"></p>
+                                    <p class="whitespace-pre-wrap text-sm" x-text="msg.content"></p>
                                     <template x-if="msg.metrics">
-                                        <div class="mt-2 pt-2 border-t border-white/20 text-xs opacity-80 flex flex-wrap gap-3">
-                                            <span>⏱️ <span x-text="msg.metrics.query_time_ms || msg.metrics.time_ms"></span>ms</span>
+                                        <div class="message-metrics">
+                                            <span>⏱️ <span x-text="((msg.metrics.query_time_ms || msg.metrics.time_ms) / 1000).toFixed(2)"></span>s</span>
                                             <span x-show="msg.metrics.chunks_found">📄 <span x-text="msg.metrics.chunks_found"></span> chunks</span>
-                                            <span>🤖 <span x-text="msg.metrics.model"></span></span>
+                                            <span x-show="msg.metrics.confidence">🎯 <span x-text="msg.metrics.confidence"></span>%</span>
+                                            <button x-show="msg.chunks_preview" @click="msg.showDebug = !msg.showDebug" class="text-xs text-accent hover:underline ml-2">
+                                                <span x-text="msg.showDebug ? '🔍 Masquer chunks' : '🔍 Debug chunks'"></span>
+                                            </button>
+                                        </div>
+                                    </template>
+                                    <!-- Debug chunks preview -->
+                                    <template x-if="msg.chunks_preview && msg.showDebug">
+                                        <div class="mt-2 pt-2 border-t border-white/20">
+                                            <p class="text-xs font-semibold mb-2 opacity-80">🔍 Chunks récupérés :</p>
+                                            <template x-for="(chunk, idx) in msg.chunks_preview" :key="idx">
+                                                <div class="mb-2 p-2 bg-black/20 rounded text-xs">
+                                                    <div class="flex justify-between mb-1">
+                                                        <span class="font-medium" x-text="chunk.source"></span>
+                                                        <span class="text-accent" x-text="(chunk.score * 100).toFixed(1) + '%'"></span>
+                                                    </div>
+                                                    <p class="opacity-70 text-xs" x-text="chunk.content"></p>
+                                                </div>
+                                            </template>
                                         </div>
                                     </template>
                                 </div>
                             </div>
                         </template>
-                        
-                        <!-- Loading indicator -->
-                        <div x-show="loading" class="flex justify-start">
-                            <div class="bg-elevated rounded-2xl px-4 py-3 flex items-center gap-3">
-                                <div class="flex gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full animate-bounce" style="background: var(--accent-400)"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full animate-bounce" style="background: var(--accent-500); animation-delay: 0.15s"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full animate-bounce" style="background: var(--accent-600); animation-delay: 0.3s"></span>
+
+                        <!-- Loading -->
+                        <div x-show="loading" class="flex justify-start animate-fadeIn">
+                            <div class="bg-elevated rounded-lg compact-padding flex items-center gap-3">
+                                <div class="flex gap-1">
+                                    <span class="w-2 h-2 rounded-full animate-bounce" style="background: var(--accent-400)"></span>
+                                    <span class="w-2 h-2 rounded-full animate-bounce" style="background: var(--accent-500); animation-delay: 0.15s"></span>
+                                    <span class="w-2 h-2 rounded-full animate-bounce" style="background: var(--accent-600); animation-delay: 0.3s"></span>
                                 </div>
-                                <!-- Stop button -->
-                                <button @click="stopGeneration()" class="ml-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium animate-pulse-red flex items-center gap-1">
-                                    <span>⏹</span> Stop
-                                </button>
+                                <button @click="stopGeneration()" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-medium">⏹ Stop</button>
                             </div>
                         </div>
-                        
+
                         <!-- Empty state -->
                         <div x-show="messages.length === 0 && !loading" class="text-center text-muted py-16">
-                            <div class="w-20 h-20 mx-auto mb-4 bg-elevated rounded-full flex items-center justify-center">
-                                <span class="text-4xl">📚</span>
+                            <div class="w-16 h-16 mx-auto mb-3 bg-elevated rounded-full flex items-center justify-center">
+                                <span class="text-3xl">📚</span>
                             </div>
-                            <p class="text-lg">Bienvenue dans votre bibliothèque</p>
-                            <p class="text-sm mt-2">Posez une question ou uploadez une image</p>
-                            <p class="text-sm mt-1 text-accent" x-show="!stats.index.exists && !visionAvailable">⚠️ Indexez vos documents ou installez un modèle vision</p>
+                            <p class="text-base">Nouvelle conversation</p>
+                            <p class="text-xs mt-2">Sélectionnez vos sources et posez une question</p>
                         </div>
                     </div>
-                    
+
+                    <!-- Source selection trigger -->
+                    <button @click="showSourceSelection = !showSourceSelection" class="w-full mb-2 text-xs text-accent hover:bg-elevated compact-padding rounded border border-themed transition-all flex items-center justify-center gap-2">
+                        <span>🎯</span> <span x-text="selectedSources.length + ' source(s) sélectionnée(s)'"></span>
+                    </button>
+
                     <!-- Image preview before send -->
-                    <div x-show="pendingImage" x-transition class="mb-3 p-3 bg-elevated rounded-xl border border-themed flex items-center gap-3">
-                        <img :src="pendingImage" class="w-16 h-16 object-cover rounded-lg" alt="Preview">
+                    <div x-show="pendingImage" x-transition class="mb-2 compact-padding bg-elevated rounded-lg border border-themed flex items-center gap-2 animate-fadeIn">
+                        <img :src="pendingImage" class="image-preview" alt="Preview">
                         <div class="flex-1">
-                            <p class="text-sm font-medium">Image prête à analyser</p>
-                            <p class="text-xs text-muted">Ajoutez une question ou envoyez directement</p>
+                            <p class="text-xs font-medium">Image prête à analyser</p>
+                            <p class="text-xs text-muted">Vision OCR</p>
                         </div>
-                        <button @click="clearPendingImage()" class="text-muted hover:text-red-400 text-xl">✕</button>
+                        <button @click="clearPendingImage()" class="text-muted hover:text-red-400">✕</button>
                     </div>
-                    
-                    <!-- Input area -->
-                    <div class="flex gap-3 items-end drop-zone rounded-xl p-1" 
+
+                    <!-- Input area with drag & drop -->
+                    <div class="drop-zone rounded-lg p-1 border border-themed mb-1"
                          :class="{'drag-over': isDragging}"
                          @dragover.prevent="isDragging = true"
                          @dragleave.prevent="isDragging = false"
                          @drop.prevent="handleDrop($event)">
-                        
-                        <!-- Upload button -->
-                        <label class="cursor-pointer bg-elevated hover:bg-tertiary border border-themed rounded-xl p-3 transition-all flex items-center justify-center" :class="{'opacity-50': !visionAvailable}">
-                            <input type="file" accept="image/*" @change="handleFileSelect($event)" class="hidden" :disabled="!visionAvailable">
-                            <span class="text-xl">📎</span>
-                        </label>
-                        
-                        <!-- Text input -->
-                        <input type="text" x-model="query" 
-                               @keydown.enter="sendMessage()"
-                               placeholder="Posez votre question ou glissez une image..."
-                               :disabled="loading"
-                               class="flex-1 bg-elevated border border-themed rounded-xl px-4 py-3 focus:outline-none focus:border-accent transition-all disabled:opacity-50"
-                               style="color: var(--text-primary)">
-                        
-                        <!-- Send button -->
-                        <button @click="sendMessage()" 
-                                :disabled="loading || (!query.trim() && !pendingImage)"
-                                class="gradient-accent disabled:opacity-50 px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2">
-                            <span x-show="!loading">Envoyer</span>
-                            <span x-show="loading">...</span>
-                        </button>
-                    </div>
-                    <p class="text-xs text-muted mt-2 text-center" x-show="visionAvailable">💡 Glissez-déposez une image ou cliquez sur 📎 pour l'analyser</p>
-                </div>
-                
-                <!-- Sources panel -->
-                <div class="bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed">
-                    <h3 class="font-semibold mb-4 text-lg flex items-center gap-2">
-                        <span class="w-8 h-8 bg-elevated rounded-lg flex items-center justify-center">📚</span>
-                        Sources
-                    </h3>
-                    <div x-show="currentSources.length === 0" class="text-muted text-sm text-center py-8">
-                        <div class="w-12 h-12 mx-auto mb-3 bg-elevated rounded-full flex items-center justify-center">
-                            <span class="text-xl opacity-50">📑</span>
-                        </div>
-                        Les sources apparaîtront ici
-                    </div>
-                    <div class="space-y-3">
-                        <template x-for="(source, index) in currentSources" :key="index">
-                            <div class="bg-elevated rounded-xl p-3 border border-themed hover:border-accent transition-all animate-slideIn" :style="'animation-delay: ' + (index * 0.1) + 's'">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="font-medium text-sm truncate flex items-center gap-2">
-                                        <span x-text="getFileIcon(source.source.split('.').pop())"></span>
-                                        <span x-text="source.source"></span>
-                                    </span>
-                                    <span class="text-xs gradient-accent px-2 py-0.5 rounded-full text-white" x-text="(source.score * 100).toFixed(1) + '%'"></span>
-                                </div>
-                                <p class="text-xs text-muted line-clamp-3" x-text="source.preview"></p>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div class="flex gap-2 items-end">
+                            <!-- Upload button -->
+                            <label class="bg-elevated hover:bg-tertiary border border-themed rounded-lg compact-padding transition-all flex items-center justify-center hover-lift" :class="{'opacity-50': !visionAvailable}" style="cursor: pointer;">
+                                <input type="file" accept="image/*" @change="handleFileSelect($event)" class="hidden" :disabled="!visionAvailable">
+                                <span class="text-base">📎</span>
+                            </label>
 
-        <!-- Documents Tab -->
-        <div x-show="activeTab === 'documents'" x-cloak x-transition>
-            <div class="bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-xl font-semibold flex items-center gap-3">
-                            <span class="w-10 h-10 bg-elevated rounded-xl flex items-center justify-center">📂</span>
-                            Documents disponibles
-                        </h2>
-                        <p class="text-muted text-sm mt-2">Placez vos fichiers dans le dossier RAG/</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <button @click="refreshFiles()" :disabled="indexing" class="bg-elevated border border-themed px-4 py-2 rounded-xl transition-all flex items-center gap-2 hover:border-accent">
-                            <span :class="{'animate-spin': refreshingFiles}">🔄</span> Rafraîchir
-                        </button>
-                        <button @click="indexDocuments()" :disabled="indexing || files.length === 0" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 disabled:from-gray-600 disabled:to-gray-700 px-4 py-2 rounded-xl font-medium transition-all flex items-center gap-2">
-                            <span x-show="!indexing">📥 Indexer</span>
-                            <span x-show="indexing" class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Indexation...
-                            </span>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Stats -->
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="bg-elevated rounded-xl p-4 text-center border border-themed">
-                        <p class="text-3xl font-bold text-accent" x-text="files.length">0</p>
-                        <p class="text-sm text-muted mt-1">Fichiers</p>
-                    </div>
-                    <div class="bg-elevated rounded-xl p-4 text-center border border-themed">
-                        <p class="text-3xl font-bold text-accent" x-text="stats.index.total_chunks">0</p>
-                        <p class="text-sm text-muted mt-1">Chunks</p>
-                    </div>
-                    <div class="bg-elevated rounded-xl p-4 text-center border border-themed">
-                        <p class="text-3xl font-bold" :class="stats.index.exists ? 'text-green-400' : 'text-red-400'" x-text="stats.index.exists ? '✓' : '✗'"></p>
-                        <p class="text-sm text-muted mt-1">Index</p>
-                    </div>
-                </div>
-                
-                <!-- Index result notification -->
-                <div x-show="indexResult" x-transition :class="indexResult?.success ? 'bg-green-900/30 border-green-500/50' : 'bg-red-900/30 border-red-500/50'" class="border rounded-xl p-4 mb-6">
-                    <p x-show="indexResult?.success" class="flex items-center gap-2">✅ <span x-text="indexResult?.documents"></span> documents, <span x-text="indexResult?.chunks"></span> chunks en <span x-text="indexResult?.time_seconds"></span>s</p>
-                    <p x-show="indexResult && !indexResult?.success" class="flex items-center gap-2">❌ <span x-text="indexResult?.error"></span></p>
-                </div>
-                
-                <!-- Files list -->
-                <div class="space-y-2">
-                    <template x-for="(file, index) in files" :key="file.path">
-                        <div class="flex items-center justify-between bg-elevated rounded-xl px-4 py-3 border border-themed hover:border-accent transition-all animate-slideIn" :style="'animation-delay: ' + (index * 0.05) + 's'">
-                            <div class="flex items-center gap-3">
-                                <span class="text-xl w-8 h-8 bg-card rounded-lg flex items-center justify-center" x-text="getFileIcon(file.type)"></span>
-                                <span x-text="file.name"></span>
-                                <span x-show="['jpg', 'jpeg', 'png'].includes(file.type) && visionAvailable" class="text-xs bg-card text-accent px-2 py-0.5 rounded-full border border-themed">👁️</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button x-show="['jpg', 'jpeg', 'png'].includes(file.type) && visionAvailable" @click="analyzeWithVision(file.path)" :disabled="analyzingImage" class="text-xs bg-card hover:bg-elevated text-accent px-3 py-1 rounded-lg transition-all border border-themed">
-                                    <span x-show="!analyzingImage || analyzingPath !== file.path">Analyser</span>
-                                    <span x-show="analyzingImage && analyzingPath === file.path">⏳</span>
-                                </button>
-                                <span class="text-sm text-muted bg-card px-2 py-1 rounded-lg" x-text="formatSize(file.size)"></span>
-                            </div>
-                        </div>
-                    </template>
-                    <div x-show="files.length === 0" class="text-center text-muted py-12">
-                        <div class="w-20 h-20 mx-auto mb-4 bg-elevated rounded-full flex items-center justify-center"><span class="text-4xl opacity-50">📂</span></div>
-                        <p class="text-lg">Aucun fichier trouvé</p>
-                        <p class="text-sm mt-2">Formats : PDF, TXT, MD, DOCX, EML, JPG, PNG</p>
-                    </div>
-                </div>
-                
-                <!-- Vision result -->
-                <div x-show="visionResult" x-transition class="mt-6 bg-elevated rounded-xl p-4 border border-accent">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-semibold flex items-center gap-2">👁️ Analyse Vision</h4>
-                        <button @click="visionResult = null" class="text-muted hover:text-white">✕</button>
-                    </div>
-                    <p class="text-sm whitespace-pre-wrap" x-text="visionResult?.analysis"></p>
-                    <p class="text-xs text-muted mt-2" x-show="visionResult?.time_ms">⏱️ <span x-text="visionResult?.time_ms"></span>ms — 🤖 <span x-text="visionResult?.model"></span></p>
-                </div>
-            </div>
-        </div>
+                            <input type="text" x-model="query"
+                                   @keydown.enter="sendMessage()"
+                                   placeholder="Posez votre question ou glissez une image..."
+                                   :disabled="loading"
+                                   class="flex-1 bg-elevated border border-themed rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent transition-all disabled:opacity-50"
+                                   style="color: var(--text-primary)">
 
-        <!-- Settings Tab -->
-        <div x-show="activeTab === 'settings'" x-cloak x-transition>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Themes -->
-                <div class="bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed md:col-span-2">
-                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-elevated rounded-xl flex items-center justify-center">🎨</span>
-                        Thème
-                    </h2>
-                    <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
-                        <template x-for="theme in themes" :key="theme.id">
-                            <button @click="setTheme(theme.id)" :class="currentTheme === theme.id ? 'ring-2 ring-offset-2 ring-offset-gray-900' : ''" :style="currentTheme === theme.id ? 'ring-color: ' + theme.accent : ''" class="relative p-4 rounded-xl border border-themed hover:border-accent transition-all">
-                                <div class="w-full h-8 rounded-lg mb-2" :style="'background: linear-gradient(135deg, ' + theme.accent + ', ' + theme.accentDark + ')'"></div>
-                                <p class="text-sm font-medium" x-text="theme.name"></p>
-                                <span x-show="currentTheme === theme.id" class="absolute top-2 right-2 text-green-400">✓</span>
+                            <button @click="sendMessage()"
+                                    :disabled="loading || (!query.trim() && !pendingImage)"
+                                    class="gradient-accent disabled:opacity-50 px-4 py-2 rounded-lg font-medium transition-all text-sm hover-lift animate-glow">
+                                <span x-show="!loading">Envoyer</span>
+                                <span x-show="loading">...</span>
                             </button>
-                        </template>
-                    </div>
-                </div>
-                
-                <!-- LLM Settings -->
-                <div class="bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed">
-                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-elevated rounded-xl flex items-center justify-center">🤖</span>
-                        Modèle LLM
-                    </h2>
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-sm text-muted mb-2">Modèle actif</label>
-                            <select x-model="selectedModel" @change="changeModel()" :disabled="ollamaModels.length === 0" class="w-full bg-elevated border border-themed rounded-xl px-4 py-3 focus:outline-none focus:border-accent transition-all" style="color: var(--text-primary)">
-                                <template x-for="model in ollamaModels" :key="model.name">
-                                    <option :value="model.name" x-text="model.name + ' (' + formatSize(model.size) + ')'"></option>
-                                </template>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-muted mb-2">Température : <span class="text-accent" x-text="settings.temperature"></span></label>
-                            <input type="range" min="0" max="1" step="0.1" x-model="settings.temperature" @change="updateSettings()" class="w-full">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-muted mb-2">Chunks (top_k) : <span class="text-accent" x-text="settings.top_k"></span></label>
-                            <input type="range" min="1" max="10" step="1" x-model="settings.top_k" @change="updateSettings()" class="w-full">
                         </div>
                     </div>
+                    <p class="text-xs text-muted text-center" x-show="visionAvailable">💡 Glissez-déposez une image ou cliquez sur 📎 pour l'analyser avec OCR</p>
                 </div>
-                
-                <!-- RAG Config -->
-                <div class="bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed">
-                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-elevated rounded-xl flex items-center justify-center">🔍</span>
-                        Configuration
-                    </h2>
-                    <div class="space-y-4">
-                        <div><label class="block text-sm text-muted mb-2">Embedding</label><div class="bg-elevated rounded-xl px-4 py-3 border border-themed" x-text="stats.settings.embedding_model"></div></div>
-                        <div><label class="block text-sm text-muted mb-2">Chunks</label><div class="bg-elevated rounded-xl px-4 py-3 border border-themed" x-text="stats.settings.chunk_size + ' car.'"></div></div>
-                        <div><label class="block text-sm text-muted mb-2">Vision</label><div class="bg-elevated rounded-xl px-4 py-3 border border-themed flex items-center gap-2"><span :class="visionAvailable ? 'text-green-400' : 'text-red-400'" x-text="visionAvailable ? '✓' : '✗'"></span><span x-text="visionAvailable ? 'Disponible' : 'Non détecté'"></span></div></div>
+            </div>
+
+            <!-- Documents Tab -->
+            <div x-show="activeTab === 'documents'" x-cloak x-transition>
+                <div class="bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-lg font-semibold flex items-center gap-2">
+                                <span class="w-8 h-8 bg-elevated rounded-lg flex items-center justify-center">📂</span>
+                                Documents
+                            </h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button @click="refreshFiles()" :disabled="indexing" class="bg-elevated border border-themed compact-padding rounded-lg transition-all flex items-center gap-2 hover:border-accent text-sm">
+                                <span :class="{'animate-spin': refreshingFiles}">🔄</span> Rafraîchir
+                            </button>
+                            <button @click="indexDocuments()" :disabled="indexing || files.length === 0" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 disabled:from-gray-600 disabled:to-gray-700 compact-padding rounded-lg font-medium transition-all flex items-center gap-2 text-sm animate-glow">
+                                <span x-show="!indexing">📥 Indexer</span>
+                                <span x-show="indexing" class="flex items-center gap-2">
+                                    <svg class="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Indexation...
+                                </span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Ollama Models -->
-                <div class="bg-card/50 backdrop-blur rounded-2xl p-6 border border-themed md:col-span-2">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold flex items-center gap-3"><span class="w-10 h-10 bg-elevated rounded-xl flex items-center justify-center">📦</span>Modèles Ollama</h2>
-                        <button @click="fetchOllamaModels()" class="text-sm text-accent hover:underline flex items-center gap-2"><span :class="{'animate-spin': fetchingModels}">🔄</span></button>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <div class="bg-elevated rounded-lg compact-padding text-center border border-themed hover-lift">
+                            <p class="text-2xl font-bold text-accent" x-text="files.length">0</p>
+                            <p class="text-xs text-muted mt-1">Fichiers</p>
+                        </div>
+                        <div class="bg-elevated rounded-lg compact-padding text-center border border-themed hover-lift">
+                            <p class="text-2xl font-bold text-accent" x-text="stats.index.total_chunks">0</p>
+                            <p class="text-xs text-muted mt-1">Chunks</p>
+                        </div>
+                        <div class="bg-elevated rounded-lg compact-padding text-center border border-themed hover-lift">
+                            <p class="text-2xl font-bold" :class="stats.index.exists ? 'text-green-400' : 'text-red-400'" x-text="stats.index.exists ? '✓' : '✗'"></p>
+                            <p class="text-xs text-muted mt-1">Index</p>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <template x-for="(model, index) in ollamaModels" :key="model.name">
-                            <div @click="selectedModel = model.name; changeModel()" :class="selectedModel === model.name ? 'border-accent bg-elevated' : 'border-themed'" class="bg-card rounded-xl p-4 border cursor-pointer transition-all hover:border-accent animate-slideIn" :style="'animation-delay: ' + (index * 0.05) + 's'">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span x-show="selectedModel === model.name" class="text-accent">✓</span>
-                                    <span x-show="model.name.includes('ministral')" class="text-sm">👁️</span>
-                                    <p class="font-medium truncate text-sm" x-text="model.name"></p>
+
+                    <!-- Index result -->
+                    <div x-show="indexResult" x-transition :class="indexResult?.success ? 'bg-green-900/30 border-green-500/50' : 'bg-red-900/30 border-red-500/50'" class="border rounded-lg compact-padding mb-4 animate-fadeIn">
+                        <p x-show="indexResult?.success" class="flex items-center gap-2 text-sm">✅ <span x-text="indexResult?.documents"></span> documents, <span x-text="indexResult?.chunks"></span> chunks en <span x-text="indexResult?.time_seconds"></span>s</p>
+                        <p x-show="indexResult && !indexResult?.success" class="flex items-center gap-2 text-sm">❌ <span x-text="indexResult?.error"></span></p>
+                    </div>
+
+                    <!-- Files list -->
+                    <div class="space-y-2">
+                        <template x-for="(file, index) in files" :key="file.path">
+                            <div class="flex items-center justify-between bg-elevated rounded-lg compact-padding border border-themed hover:border-accent transition-all animate-slideIn hover-lift" :style="'animation-delay: ' + (index * 0.03) + 's'">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base" x-text="getFileIcon(file.type)"></span>
+                                    <span class="text-sm" x-text="file.name"></span>
                                 </div>
-                                <p class="text-xs text-muted" x-text="formatSize(model.size)"></p>
+                                <span class="text-xs text-muted bg-card px-2 py-1 rounded" x-text="formatSize(file.size)"></span>
                             </div>
                         </template>
+                        <div x-show="files.length === 0" class="text-center text-muted py-12">
+                            <p class="text-sm">Aucun fichier</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <footer class="mt-12 text-center text-muted text-sm">
-            <p>Family RAG v2.5 — Développé par Liam4Chill</p>
-        </footer>
+            <!-- Settings Tab -->
+            <div x-show="activeTab === 'settings'" x-cloak x-transition>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Themes -->
+                    <div class="bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed md:col-span-2">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-elevated rounded-lg flex items-center justify-center">🎨</span>
+                            Thème
+                        </h2>
+                        <div class="grid grid-cols-3 gap-3">
+                            <template x-for="theme in themes" :key="theme.id">
+                                <button @click="setTheme(theme.id)" :class="currentTheme === theme.id ? 'ring-2 ring-offset-2 ring-offset-gray-900 animate-pulse-border' : ''" :style="currentTheme === theme.id ? 'ring-color: ' + theme.accent : ''" class="relative compact-padding rounded-lg border border-themed hover:border-accent transition-all hover-lift">
+                                    <div class="w-full h-6 rounded mb-2" :style="'background: linear-gradient(135deg, ' + theme.accent + ', ' + theme.accentDark + ')'"></div>
+                                    <p class="text-sm font-medium" x-text="theme.name"></p>
+                                    <span x-show="currentTheme === theme.id" class="absolute top-2 right-2 text-green-400">✓</span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- LLM Settings -->
+                    <div class="bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-elevated rounded-lg flex items-center justify-center">🤖</span>
+                            Modèle LLM
+                        </h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-muted mb-2">Modèle actif</label>
+                                <select x-model="selectedModel" @change="changeModel()" :disabled="ollamaModels.length === 0" class="w-full bg-elevated border border-themed rounded-lg compact-padding text-sm focus:outline-none focus:border-accent transition-all" style="color: var(--text-primary)">
+                                    <template x-for="model in ollamaModels" :key="model.name">
+                                        <option :value="model.name" x-text="model.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-muted mb-2">Température : <span class="text-accent" x-text="settings.temperature"></span></label>
+                                <input type="range" min="0" max="1" step="0.1" x-model="settings.temperature" @change="updateSettings()" class="w-full">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-muted mb-2">Chunks (top_k) : <span class="text-accent" x-text="settings.top_k"></span></label>
+                                <input type="range" min="1" max="10" step="1" x-model="settings.top_k" @change="updateSettings()" class="w-full">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Embedding Model Settings -->
+                    <div class="bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <span class="w-8 h-8 bg-elevated rounded-lg flex items-center justify-center">🔍</span>
+                            Modèle Embedding
+                        </h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-muted mb-2">Modèle actif</label>
+                                <select x-model="selectedEmbeddingModel" @change="changeEmbeddingModel()" :disabled="embeddingModels.length === 0" class="w-full bg-elevated border border-themed rounded-lg compact-padding text-sm focus:outline-none focus:border-accent transition-all" style="color: var(--text-primary)">
+                                    <template x-for="model in embeddingModels" :key="model.name">
+                                        <option :value="model.name" x-text="model.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <!-- Avertissement ré-indexation -->
+                            <div x-show="needsReindex" x-transition class="bg-orange-900/30 border border-orange-500/50 rounded-lg compact-padding animate-fadeIn">
+                                <p class="text-xs text-orange-300 font-medium mb-1">⚠️ Ré-indexation requise</p>
+                                <p class="text-xs text-orange-200 opacity-80">Le modèle d'embedding a changé. Cliquez sur "Indexer" dans l'onglet Documents.</p>
+                            </div>
+                            <!-- Info chunk size -->
+                            <div>
+                                <label class="block text-xs text-muted mb-2">Configuration</label>
+                                <div class="bg-elevated rounded-lg compact-padding border border-themed text-xs">
+                                    <p class="mb-1">Chunk size: <span class="text-accent" x-text="stats.settings.chunk_size"></span> caractères</p>
+                                    <p>Overlap: <span class="text-accent" x-text="stats.settings.chunk_overlap"></span> caractères</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="mt-8 text-center text-muted text-xs">
+                <p>Family RAG v2.6.2 — Sélection modèles UI</p>
+            </footer>
+        </div>
     </div>
 
     <script>
-        // Floating shapes animation
+        // === FLOATING SHAPES ===
         function initFloatingShapes() {
             const container = document.getElementById('floating-bg');
             const shapes = [
+                { class: 'shape-diamond', size: 100 },
+                { class: 'shape-circle', size: 120 },
+                { class: 'shape-triangle', size: 104 },
                 { class: 'shape-diamond', size: 80 },
                 { class: 'shape-circle', size: 100 },
-                { class: 'shape-diamond', size: 60 },
-                { class: 'shape-circle', size: 70 },
-                { class: 'shape-diamond', size: 90 }
+                { class: 'shape-triangle', size: 90 }
             ];
-            
+
             shapes.forEach((shapeConfig, i) => {
                 const shape = document.createElement('div');
                 shape.className = `shape ${shapeConfig.class}`;
-                
-                // Random starting position
+
                 const startX = Math.random() * (window.innerWidth - shapeConfig.size);
                 const startY = Math.random() * (window.innerHeight - shapeConfig.size);
-                
+
                 shape.style.left = startX + 'px';
                 shape.style.top = startY + 'px';
-                
+
                 container.appendChild(shape);
-                
-                // Animate with random velocity
+
                 let x = startX, y = startY;
-                let vx = (Math.random() - 0.5) * 1.5;
-                let vy = (Math.random() - 0.5) * 1.5;
+                let vx = (Math.random() - 0.5) * 2;
+                let vy = (Math.random() - 0.5) * 2;
                 const size = shapeConfig.size;
-                
+
                 function animate() {
                     x += vx;
                     y += vy;
-                    
-                    // Bounce off edges
+
                     if (x <= 0 || x >= window.innerWidth - size) {
                         vx *= -1;
                         x = Math.max(0, Math.min(x, window.innerWidth - size));
@@ -539,26 +626,25 @@
                         vy *= -1;
                         y = Math.max(0, Math.min(y, window.innerHeight - size));
                     }
-                    
+
                     shape.style.left = x + 'px';
                     shape.style.top = y + 'px';
-                    
+
                     requestAnimationFrame(animate);
                 }
-                
-                // Stagger start
+
                 setTimeout(animate, i * 200);
             });
         }
-        
+
         document.addEventListener('DOMContentLoaded', initFloatingShapes);
-        
+
+        // === ALPINE APP ===
         function ragApp() {
             return {
                 activeTab: 'chat',
                 query: '',
                 messages: [],
-                currentSources: [],
                 loading: false,
                 abortController: null,
                 indexing: false,
@@ -567,54 +653,58 @@
                 ollamaConnected: false,
                 ollamaModels: [],
                 selectedModel: '',
+                embeddingModels: [],
+                selectedEmbeddingModel: '',
+                needsReindex: false,
                 refreshingFiles: false,
                 fetchingModels: false,
                 visionAvailable: false,
-                visionResult: null,
-                analyzingImage: false,
-                analyzingPath: '',
                 pendingImage: null,
                 pendingImageData: null,
                 isDragging: false,
-                currentTheme: localStorage.getItem('familyrag-theme') || 'darkpro',
+                currentTheme: localStorage.getItem('familyrag-theme') || 'midnight',
                 themes: [
-                    { id: 'darkpro', name: 'Dark Pro', accent: '#0ea5e9', accentDark: '#0369a1' },
-                    { id: 'ocean', name: 'Ocean', accent: '#06b6d4', accentDark: '#0e7490' },
-                    { id: 'forest', name: 'Forest', accent: '#22c55e', accentDark: '#15803d' },
-                    { id: 'amber', name: 'Amber', accent: '#f59e0b', accentDark: '#b45309' },
-                    { id: 'mono', name: 'Mono', accent: '#71717a', accentDark: '#3f3f46' },
-                    { id: 'family', name: 'Family', accent: '#d946ef', accentDark: '#a21caf' }
+                    { id: 'midnight', name: 'Midnight', accent: '#2563eb', accentDark: '#1e40af' },
+                    { id: 'cyber', name: 'Cyber', accent: '#00d4ff', accentDark: '#0e7490' },
+                    { id: 'tactical', name: 'Tactical', accent: '#ff3333', accentDark: '#b91c1c' }
                 ],
-                stats: { index: { exists: false, total_documents: 0, total_chunks: 0 }, settings: { llm_model: '', embedding_model: '', chunk_size: 0, chunk_overlap: 0, temperature: 0.7, top_k: 4 } },
-                settings: { temperature: 0.7, top_k: 4 },
-                
+                stats: { index: { exists: false, total_documents: 0, total_chunks: 0 }, settings: { llm_model: '', embedding_model: '', chunk_size: 0, chunk_overlap: 0, temperature: 0.7, top_k: 8 } },
+                settings: { temperature: 0.7, top_k: 8 },
+
+                // Conversation management
+                sidebarOpen: false,
+                conversations: [],
+                currentConversationId: null,
+
+                // Source selection
+                showSourceSelection: false,
+                selectedSources: [],
+
                 async init() {
                     document.documentElement.setAttribute('data-theme', this.currentTheme);
                     await this.checkHealth();
                     await this.refreshFiles();
                     await this.fetchStats();
                     await this.fetchOllamaModels();
+                    await this.fetchEmbeddingModels();
                     this.selectedModel = this.stats.settings.llm_model;
+                    this.selectedEmbeddingModel = this.stats.settings.embedding_model;
                     this.checkVisionAvailable();
+                    this.loadConversations();
+                    this.newConversation();
                     setInterval(() => this.checkHealth(), 30000);
                 },
-                
-                setTheme(id) {
-                    this.currentTheme = id;
-                    document.documentElement.setAttribute('data-theme', id);
-                    localStorage.setItem('familyrag-theme', id);
-                },
-                
+
                 checkVisionAvailable() {
-                    const vm = ['ministral-3', 'ministral', 'llava', 'moondream'];
-                    this.visionAvailable = this.ollamaModels.some(m => vm.some(v => m.name.toLowerCase().includes(v)));
+                    const visionModels = ['ministral-3', 'ministral', 'llava', 'moondream'];
+                    this.visionAvailable = this.ollamaModels.some(m => visionModels.some(v => m.name.toLowerCase().includes(v)));
                 },
-                
+
                 handleFileSelect(event) {
                     const file = event.target.files[0];
                     if (file) this.processImageFile(file);
                 },
-                
+
                 handleDrop(event) {
                     this.isDragging = false;
                     const file = event.dataTransfer.files[0];
@@ -622,7 +712,7 @@
                         this.processImageFile(file);
                     }
                 },
-                
+
                 processImageFile(file) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -631,50 +721,142 @@
                     };
                     reader.readAsDataURL(file);
                 },
-                
+
                 clearPendingImage() {
                     this.pendingImage = null;
                     this.pendingImageData = null;
                 },
-                
+
+                setTheme(id) {
+                    this.currentTheme = id;
+                    document.documentElement.setAttribute('data-theme', id);
+                    localStorage.setItem('familyrag-theme', id);
+                },
+
+                // Conversation methods
+                newConversation() {
+                    const id = 'conv_' + Date.now();
+                    // Par défaut, sélectionner TOUTES les sources pour éviter les recherches vides
+                    const defaultSources = this.files.map(f => f.name);
+                    const conv = {
+                        id: id,
+                        title: 'Nouvelle conversation',
+                        messages: [],
+                        selectedSources: defaultSources,
+                        timestamp: Date.now()
+                    };
+                    this.conversations.unshift(conv);
+                    this.currentConversationId = id;
+                    this.messages = [];
+                    this.selectedSources = defaultSources;
+                    this.showSourceSelection = false; // Ne pas afficher par défaut, toutes les sources sont déjà sélectionnées
+                    this.saveConversations();
+                },
+
+                loadConversation(id) {
+                    const conv = this.conversations.find(c => c.id === id);
+                    if (conv) {
+                        this.currentConversationId = id;
+                        this.messages = conv.messages || [];
+                        this.selectedSources = conv.selectedSources || [];
+                        this.sidebarOpen = false;
+                        this.$nextTick(() => this.scrollChat());
+                    }
+                },
+
+                deleteConversation(id) {
+                    // Supprimer la conversation du tableau
+                    const index = this.conversations.findIndex(c => c.id === id);
+                    if (index !== -1) {
+                        this.conversations.splice(index, 1);
+                    }
+
+                    // Si c'est la conversation active, créer une nouvelle
+                    if (this.currentConversationId === id) {
+                        if (this.conversations.length > 0) {
+                            // Charger la première conversation disponible
+                            this.loadConversation(this.conversations[0].id);
+                        } else {
+                            // Créer une nouvelle conversation
+                            this.newConversation();
+                        }
+                    }
+
+                    // Sauvegarder immédiatement
+                    this.saveConversations();
+                },
+
+                saveConversations() {
+                    localStorage.setItem('familyrag-conversations', JSON.stringify(this.conversations));
+                },
+
+                loadConversations() {
+                    const saved = localStorage.getItem('familyrag-conversations');
+                    if (saved) {
+                        this.conversations = JSON.parse(saved);
+                    }
+                },
+
+                updateCurrentConversation() {
+                    const conv = this.conversations.find(c => c.id === this.currentConversationId);
+                    if (conv) {
+                        conv.messages = this.messages;
+                        conv.selectedSources = this.selectedSources;
+                        conv.timestamp = Date.now();
+                        if (this.messages.length > 0) {
+                            conv.title = this.messages[0].content.substring(0, 50) + '...';
+                        }
+                        this.saveConversations();
+                    }
+                },
+
+                // Source selection
+                selectAllSources() {
+                    this.selectedSources = this.files.map(f => f.name);
+                },
+
+                deselectAllSources() {
+                    this.selectedSources = [];
+                },
+
                 async sendMessage() {
                     if (this.loading) return;
                     if (!this.query.trim() && !this.pendingImage) return;
-                    
+
                     const question = this.query.trim() || "Décris cette image en détail et extrait tout le texte visible.";
                     const hasImage = !!this.pendingImage;
-                    
+
                     // Add user message
-                    this.messages.push({ 
-                        type: 'user', 
+                    this.messages.push({
+                        type: 'user',
                         content: this.query.trim() || "Analyse cette image",
                         image: this.pendingImage
                     });
-                    
+
                     this.query = '';
                     this.loading = true;
                     this.abortController = new AbortController();
                     this.scrollChat();
-                    
+
                     try {
                         let response, data;
-                        
+
                         if (hasImage) {
                             // Vision analysis
                             response = await fetch('/api/vision/base64', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
+                                body: JSON.stringify({
                                     image_data: this.pendingImageData,
-                                    question: question 
+                                    question: question
                                 }),
                                 signal: this.abortController.signal
                             });
                             data = await response.json();
-                            
+
                             if (data.success) {
-                                this.messages.push({ 
-                                    type: 'assistant', 
+                                this.messages.push({
+                                    type: 'assistant',
                                     content: data.analysis,
                                     metrics: { time_ms: data.time_ms, model: data.model }
                                 });
@@ -686,14 +868,32 @@
                             response = await fetch('/api/query', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ question, top_k: parseInt(this.settings.top_k) }),
+                                body: JSON.stringify({
+                                    question: question,
+                                    top_k: parseInt(this.settings.top_k),
+                                    selected_sources: this.selectedSources
+                                }),
                                 signal: this.abortController.signal
                             });
                             data = await response.json();
-                            
+
                             if (response.ok) {
-                                this.messages.push({ type: 'assistant', content: data.answer, metrics: data.metrics });
-                                this.currentSources = data.sources;
+                                // Calculate confidence score (based on avg source score)
+                                const avgScore = data.sources && data.sources.length > 0
+                                    ? (data.sources.reduce((sum, s) => sum + (s.score || 0), 0) / data.sources.length * 100).toFixed(1)
+                                    : null;
+
+                                this.messages.push({
+                                    type: 'assistant',
+                                    content: data.answer,
+                                    chunks_preview: data.chunks_preview || null,
+                                    showDebug: false,
+                                    metrics: {
+                                        query_time_ms: data.metrics.query_time_ms,
+                                        chunks_found: data.metrics.chunks_found,
+                                        confidence: avgScore
+                                    }
+                                });
                             } else {
                                 this.messages.push({ type: 'assistant', content: '❌ ' + (data.detail || 'Erreur') });
                             }
@@ -705,28 +905,29 @@
                             this.messages.push({ type: 'assistant', content: '❌ ' + e.message });
                         }
                     }
-                    
+
                     this.loading = false;
                     this.clearPendingImage();
+                    this.updateCurrentConversation();
                     this.scrollChat();
                 },
-                
+
                 stopGeneration() {
                     if (this.abortController) {
                         this.abortController.abort();
                     }
                 },
-                
+
                 async checkHealth() {
                     try { const r = await fetch('/health'); this.ollamaConnected = (await r.json()).ollama_connected; } catch { this.ollamaConnected = false; }
                 },
-                
+
                 async refreshFiles() {
                     this.refreshingFiles = true;
                     try { this.files = (await (await fetch('/api/files')).json()).files; } catch {}
                     this.refreshingFiles = false;
                 },
-                
+
                 async fetchStats() {
                     try {
                         const d = await (await fetch('/api/stats')).json();
@@ -736,49 +937,83 @@
                         this.selectedModel = d.settings.llm_model;
                     } catch {}
                 },
-                
+
                 async fetchOllamaModels() {
                     this.fetchingModels = true;
-                    try { this.ollamaModels = (await (await fetch('/api/ollama/models')).json()).models; this.checkVisionAvailable(); } catch { this.ollamaModels = []; }
+                    try {
+                        this.ollamaModels = (await (await fetch('/api/ollama/models')).json()).models;
+                        this.checkVisionAvailable();
+                    } catch {
+                        this.ollamaModels = [];
+                    }
                     this.fetchingModels = false;
                 },
-                
+
+                async fetchEmbeddingModels() {
+                    try {
+                        this.embeddingModels = (await (await fetch('/api/ollama/embedding-models')).json()).models;
+                    } catch {
+                        this.embeddingModels = [];
+                    }
+                },
+
                 async indexDocuments() {
                     this.indexing = true; this.indexResult = null;
                     try {
                         const r = await fetch('/api/index', { method: 'POST' });
                         this.indexResult = await r.json();
-                        if (r.ok) await this.fetchStats();
+                        if (r.ok) {
+                            await this.fetchStats();
+                            // Masquer l'avertissement de ré-indexation après indexation réussie
+                            this.needsReindex = false;
+                        }
                     } catch (e) { this.indexResult = { success: false, error: e.message }; }
                     this.indexing = false;
                 },
-                
-                async analyzeWithVision(path) {
-                    this.analyzingImage = true; this.analyzingPath = path; this.visionResult = null;
-                    try {
-                        const r = await fetch('/api/vision', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ image_path: path, question: "Décris cette image en détail. Extrais tout le texte visible." })
-                        });
-                        const d = await r.json();
-                        this.visionResult = d.success ? d : { analysis: '❌ ' + d.error };
-                    } catch (e) { this.visionResult = { analysis: '❌ ' + e.message }; }
-                    this.analyzingImage = false; this.analyzingPath = '';
-                },
-                
+
                 async updateSettings() {
                     try { await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ temperature: parseFloat(this.settings.temperature), top_k: parseInt(this.settings.top_k) }) }); } catch {}
                 },
-                
+
                 async changeModel() {
                     if (!this.selectedModel) return;
                     try { const r = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ llm_model: this.selectedModel }) }); if (r.ok) await this.fetchStats(); } catch {}
                 },
-                
+
+                async changeEmbeddingModel() {
+                    if (!this.selectedEmbeddingModel) return;
+                    try {
+                        const r = await fetch('/api/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ embedding_model: this.selectedEmbeddingModel })
+                        });
+                        if (r.ok) {
+                            const data = await r.json();
+                            // Afficher l'avertissement de ré-indexation si nécessaire
+                            this.needsReindex = data.needs_reindex || false;
+                            await this.fetchStats();
+                        }
+                    } catch (e) {
+                        console.error('Erreur changement modèle embedding:', e);
+                    }
+                },
+
                 scrollChat() { this.$nextTick(() => { const c = document.getElementById('chat-messages'); if (c) c.scrollTop = c.scrollHeight; }); },
                 formatSize(b) { if (!b) return '0 B'; const k = 1024, s = ['B','KB','MB','GB'], i = Math.floor(Math.log(b)/Math.log(k)); return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i]; },
-                getFileIcon(t) { return { pdf:'📕', txt:'📄', md:'📝', docx:'📘', eml:'📧', jpg:'🖼️', jpeg:'🖼️', png:'🖼️' }[t] || '📎'; }
+                getFileIcon(t) { return { pdf:'📕', txt:'📄', md:'📝', docx:'📘', eml:'📧', jpg:'🖼️', jpeg:'🖼️', png:'🖼️' }[t] || '📎'; },
+                formatTime(timestamp) {
+                    const date = new Date(timestamp);
+                    const now = new Date();
+                    const diff = now - date;
+                    const minutes = Math.floor(diff / 60000);
+                    const hours = Math.floor(diff / 3600000);
+                    const days = Math.floor(diff / 86400000);
+
+                    if (minutes < 60) return minutes + 'min';
+                    if (hours < 24) return hours + 'h';
+                    return days + 'j';
+                }
             };
         }
     </script>
