@@ -203,8 +203,7 @@ Ouvrez **http://localhost:8000** 🎉
 
 | Guide | Description |
 |-------|-------------|
-| [Administration](docs/MANAGE.md) | Gestion, diagnostic et maintenance |
-| [Migration v2.6](docs/MIGRATION_v2_6.md) | Mise à jour depuis v2.5 |
+| [Administration](/MANAGE.md) | Gestion, diagnostic et maintenance |
 | [Changelog](CHANGELOG.md) | Historique complet des versions |
 
 ---
