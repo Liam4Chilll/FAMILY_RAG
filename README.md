@@ -14,20 +14,21 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Apple_Silicon-M1%2FM2%2FM3-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Apple Silicon"/>
+  <img src="https://img.shields.io/badge/Linux-Serveur-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux"/>
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License"/>
 </p>
 
 ---
 
-<h1 align="center">📚 FamilyRAG 2.6</h1>
+<h1 align="center">📚 FamilyRAG 2.7</h1>
 
 <h3 align="center">
-  <em>Votre bibliothèque numérique privée — maintenant avec une précision décuplée</em>
+  <em>Votre bibliothèque numérique privée — maintenant accessible partout dans votre réseau</em>
 </h3>
 
 <p align="center">
   Posez des questions à vos documents en langage naturel.<br/>
-  Sans cloud. Sans abonnement. Sans compromis sur la vie privée.
+  Sans cloud. Sans abonnement. Sans compromis sur la vie privée.<br/>
 </p>
 
 ---
@@ -48,11 +49,44 @@ Imaginez pouvoir interroger en langage naturel :
 
 ---
 
-## ✨ Nouveautés v2.6
+## ✨ Nouveautés v2.7
+
+### 🐧 Support Linux complet — Déploiement serveur
+
+La v2.7 marque une évolution majeure : **FamilyRAG devient un serveur accessible depuis tout votre réseau local** !
+
+- **Déploiement sur VM/serveur Linux** — Documentation complète avec guide pas à pas
+- **Auto-détection intelligente d'Ollama** — Trouve automatiquement Ollama (Mac, Windows, Linux)
+- **Accès réseau centralisé** — Un seul serveur, accessible depuis tous vos appareils (PC, Mac, mobile)
+- **Configuration simplifiée** — Plus besoin de manipulation complexe, tout est automatique
+- **Fichier de config Ollama inclus** — `ollama-override.conf` prêt à l'emploi pour Linux
+
+### 📊 Monitoring système en temps réel
+
+- **Dashboard métriques** — CPU, RAM, disque affichés dans l'interface
+- **Endpoint API dédié** — `/api/system/metrics` pour surveiller les ressources
+- **Alertes visuelles** — Indicateurs de santé système en direct
+
+### 🎯 Indexation et recherche améliorées
+
+- **Indexation sélective** — Choisissez précisément les fichiers à indexer
+- **Filtrage par sources** — Limitez la recherche à des documents spécifiques
+- **Re-ranking optionnel** — Activez/désactivez le re-ranking selon vos besoins
+- **Détails d'index enrichis** — Visualisez exactement quels fichiers sont indexés
+
+### 🔧 Robustesse et fiabilité
+
+- **Gestion d'erreur améliorée** — Messages clairs en cas de problème
+- **Vérification automatique des chunks** — Prévient les dépassements de limite d'embedding
+- **Détection multi-environnement** — Fonctionne sur Mac, Windows, Linux sans config manuelle
+
+---
+
+## 🎊 Rappel des bénéfices v2.6 — La révolution RAG
+
+La v2.6 avait déjà apporté une **refonte majeure du pipeline de recherche** :
 
 ### 🎯 Précision RAG +65%
-
-La v2.6 représente une refonte majeure du pipeline de recherche :
 
 - **Re-ranking LLM** — Chaque chunk est réévalué sémantiquement par le LLM, éliminant les faux positifs
 - **Métadonnées enrichies** — Date, année, type de document et auteur extraits automatiquement
@@ -77,13 +111,6 @@ La v2.6 représente une refonte majeure du pipeline de recherche :
 - **Cyber** — Cyan néon, ambiance tech
 - **Tactical** — Vert militaire, rouge accent
 
-### 📎 Fonctionnalités v2.5 conservées
-
-- Upload d'images dans le chat (glisser-déposer ou 📎)
-- Analyse vision via Ministral 3
-- Bouton Stop pour interrompre une génération
-- Arrière-plan avec formes géométriques flottantes
-
 ---
 
 ## 📊 Gains de précision v2.5 → v2.6
@@ -92,7 +119,7 @@ La v2.6 représente une refonte majeure du pipeline de recherche :
 |----------|------|------|
 | Chunks récupérés | 4 | 12 |
 | Réponses avec citations | ~30% | ~85% |
-| Faux positifs | ~40% | ~10% | -75% |
+| Faux positifs | ~40% | ~10% |
 | **Précision globale** | **~45%** | **~75%** |
 
 ---
@@ -113,38 +140,54 @@ La v2.6 représente une refonte majeure du pipeline de recherche :
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture v2.7
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      MacBook (Apple Silicon)                    │
+│               Réseau Local (192.168.x.x)                        │
 │                                                                 │
-│  ┌─────────────────┐        ┌────────────────────────────────┐  │
-│  │     Ollama      │◄──────►│     Docker Container           │  │
-│  │   (natif Mac)   │  API   │                                │  │
-│  │                 │        │  ┌──────────────────────────┐  │  │
-│  │ • ministral-3   │        │  │  FastAPI + FAISS         │  │  │
-│  │ • nomic-embed   │        │  │  + LangChain + Tesseract │  │  │
-│  │                 │        │  └──────────────────────────┘  │  │
-│  └─────────────────┘        │                                │  │
-│          │                  │  ┌──────────────────────────┐  │  │
-│          │ GPU              │  │  WebUI (3 thèmes)        │  │  │
-│          ▼                  │  │  Tailwind + Alpine       │  │  │
-│  ┌─────────────────┐        │  └──────────────────────────┘  │  │
-│  │  Apple Silicon  │        │                                │  │
-│  │   M1/M2/M3      │        │        localhost:8000          │  │
-│  └─────────────────┘        └────────────────────────────────┘  │
-│                                        ▲                        │
-│  ┌─────────────────┐                   │                        │
-│  │  📁 Vos Docs    │───────────────────┘                        │
-│  │  (RAG folder)   │  volume mount                              │
-│  └─────────────────┘                                            │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐        │
+│  │  MacBook     │   │  PC Windows  │   │  Mobile      │        │
+│  │  Safari      │   │  Chrome      │   │  Safari      │        │
+│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘        │
+│         │                  │                  │                │
+│         └──────────────────┼──────────────────┘                │
+│                            │                                   │
+│                            ▼                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │         Serveur Linux (VM / Machine dédiée)             │   │
+│  │                                                         │   │
+│  │  ┌─────────────────┐        ┌─────────────────────┐    │   │
+│  │  │     Ollama      │◄──────►│  Docker Container   │    │   │
+│  │  │   (natif Linux) │  API   │                     │    │   │
+│  │  │                 │        │  ┌───────────────┐  │    │   │
+│  │  │ • ministral-3   │        │  │  FastAPI      │  │    │   │
+│  │  │ • nomic-embed   │        │  │  + FAISS      │  │    │   │
+│  │  │ • mistral       │        │  │  + LangChain  │  │    │   │
+│  │  └─────────────────┘        │  │  + Tesseract  │  │    │   │
+│  │          │                  │  └───────────────┘  │    │   │
+│  │          │ GPU/CPU          │                     │    │   │
+│  │          ▼                  │  ┌───────────────┐  │    │   │
+│  │  ┌─────────────────┐        │  │  WebUI        │  │    │   │
+│  │  │  CPU/RAM/Disque │        │  │  3 thèmes     │  │    │   │
+│  │  │  (Monitoring)   │        │  │  + Metrics    │  │    │   │
+│  │  └─────────────────┘        │  └───────────────┘  │    │   │
+│  │                             │                     │    │   │
+│  │  ┌─────────────────┐        │  http://IP:8000     │    │   │
+│  │  │  📁 Vos Docs    │────────┴─────────────────────┘    │   │
+│  │  │  (RAG folder)   │    volume mount                   │   │
+│  │  └─────────────────┘                                   │   │
+│  └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Prérequis
+## 🚀 Installation
+
+### Mac / Windows (Docker Desktop)
+
+#### 1. Prérequis
 
 - **Ollama 0.13.1+** (requis pour Ministral 3)
 - Docker Desktop
@@ -154,11 +197,7 @@ La v2.6 représente une refonte majeure du pipeline de recherche :
 ollama --version
 ```
 
----
-
-## Installation
-
-### 1. Cloner et configurer
+#### 2. Cloner et configurer
 
 ```bash
 git clone https://github.com/Liam4Chilll/family-rag.git
@@ -173,7 +212,7 @@ nano .env
 # Modifier HOST_DATA_PATH=/chemin/vers/vos/documents
 ```
 
-### 2. Installer les modèles Ollama
+#### 3. Installer les modèles Ollama
 
 ```bash
 # Modèle de génération + vision (recommandé)
@@ -187,15 +226,21 @@ ollama pull mistral:latest
 ollama pull nomic-embed-text
 ```
 
-### 3. Lancer
+#### 4. Lancer
 
 ```bash
 docker compose up -d --build
 ```
 
-### 4. C'est prêt !
+#### 5. C'est prêt !
 
 Ouvrez **http://localhost:8000** 🎉
+
+**Avantages du déploiement serveur** :
+- ✅ **Une seule instance** pour toute la famille
+- ✅ **Accès depuis n'importe quel appareil** du réseau local
+- ✅ **Ressources mutualisées** (pas besoin de GPU sur chaque machine)
+- ✅ **Données centralisées** et toujours disponibles
 
 ---
 
@@ -205,6 +250,31 @@ Ouvrez **http://localhost:8000** 🎉
 |-------|-------------|
 | [Administration](/MANAGE.md) | Gestion, diagnostic et maintenance |
 | [Changelog](https://github.com/Liam4Chilll/FAMILY_RAG/releases) | Historique complet des versions |
+
+---
+
+## 🎯 Cas d'usage
+
+### Mode Standalone (Mac/Windows)
+- Utilisation personnelle sur votre ordinateur
+- Données locales, aucun réseau requis
+- Idéal pour tester ou usage nomade
+
+### Mode Serveur (Linux)
+- Serveur central accessible par toute la famille
+- Mutualisation des ressources (CPU, RAM, stockage)
+- Accès depuis n'importe quel appareil (PC, Mac, mobile)
+- Idéal pour un NAS, une VM ou un serveur domestique
+
+---
+
+## 🔒 Sécurité et confidentialité
+
+- **100% local** — Aucune donnée n'est envoyée à des serveurs externes
+- **Pas de télémétrie** — Aucun tracking, aucune statistique collectée
+- **Accès réseau local uniquement** — Non exposé sur Internet par défaut
+- **Données chiffrées** — Utilisez le chiffrement de votre OS/NAS pour les documents sensibles
+- **Open Source** — Code auditable, licence MIT
 
 ---
 
