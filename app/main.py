@@ -3,6 +3,7 @@
 import httpx
 import uuid
 import shutil
+import psutil
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File
@@ -10,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 from config import get_settings
 from rag_engine import RAGEngine
@@ -31,7 +32,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Family RAG",
     description="Système RAG local pour la famille",
-    version="2.6.2",
+    version="2.7.0",
     lifespan=lifespan
 )
 
@@ -104,11 +105,17 @@ async def list_files():
     return {"files": rag_engine.doc_loader.list_files()}
 
 
+class IndexRequest(BaseModel):
+    """Requête d'indexation avec fichiers sélectionnés."""
+    selected_files: Optional[List[str]] = None  # Liste des chemins de fichiers à indexer
+
+
 @app.post("/api/index")
-async def index_documents():
-    """Indexe tous les documents."""
+async def index_documents(request: IndexRequest = None):
+    """Indexe les documents sélectionnés (ou tous si aucune sélection)."""
     try:
-        result = rag_engine.index_documents()
+        selected_files = request.selected_files if request else None
+        result = rag_engine.index_documents(selected_files=selected_files)
         if not result['success']:
             raise HTTPException(status_code=400, detail=result.get('error', 'Indexation échouée'))
         return result
@@ -122,6 +129,12 @@ async def index_documents():
             'documents': 0,
             'chunks': 0
         }
+
+
+@app.get("/api/index/details")
+async def get_index_details():
+    """Retourne les détails de l'index FAISS (fichiers indexés, nombre de vecteurs, etc.)."""
+    return rag_engine.get_index_details()
 
 
 @app.post("/api/query")
@@ -214,8 +227,17 @@ async def update_settings(settings: SettingsUpdate):
 
 @app.get("/api/ollama/models")
 async def get_ollama_models():
-    """Liste les modèles disponibles sur Ollama."""
+    """Liste les modèles LLM disponibles sur Ollama (exclut les modèles d'embedding)."""
     settings = get_settings()
+
+    # Modèles d'embedding à exclure
+    EMBEDDING_MODELS = {
+        "nomic-embed-text", "nomic",
+        "mxbai-embed-large", "mxbai",
+        "snowflake-arctic-embed", "snowflake",
+        "all-minilm", "minilm",
+        "bge-", "gte-"
+    }
 
     try:
         async with httpx.AsyncClient() as client:
@@ -226,15 +248,20 @@ async def get_ollama_models():
             response.raise_for_status()
             data = response.json()
 
-            return {
-                "models": [
-                    {
+            # Filtrer pour exclure les modèles d'embedding
+            llm_models = []
+            for m in data.get("models", []):
+                name = m["name"].lower()
+                # Vérifier que ce n'est PAS un modèle d'embedding
+                if not any(embed_name in name for embed_name in EMBEDDING_MODELS):
+                    llm_models.append({
                         "name": m["name"],
                         "size": m.get("size", 0),
                         "modified": m.get("modified_at", "")
-                    }
-                    for m in data.get("models", [])
-                ]
+                    })
+
+            return {
+                "models": llm_models
             }
     except httpx.RequestError as e:
         raise HTTPException(
@@ -285,6 +312,56 @@ async def get_embedding_models():
             status_code=503,
             detail=f"Impossible de contacter Ollama: {str(e)}"
         )
+
+
+@app.get("/api/system/metrics")
+async def get_system_metrics():
+    """Retourne les métriques système en temps réel (CPU, RAM, disque)."""
+    try:
+        # CPU
+        cpu_percent = psutil.cpu_percent(interval=0.1)
+        cpu_count = psutil.cpu_count()
+
+        # RAM
+        memory = psutil.virtual_memory()
+        memory_total_gb = memory.total / (1024 ** 3)
+        memory_used_gb = memory.used / (1024 ** 3)
+        memory_available_gb = memory.available / (1024 ** 3)
+        memory_percent = memory.percent
+
+        # Disque (partition racine)
+        disk = psutil.disk_usage('/')
+        disk_total_gb = disk.total / (1024 ** 3)
+        disk_used_gb = disk.used / (1024 ** 3)
+        disk_free_gb = disk.free / (1024 ** 3)
+        disk_percent = disk.percent
+
+        return {
+            "cpu": {
+                "percent": round(cpu_percent, 1),
+                "count": cpu_count,
+                "available": round(100 - cpu_percent, 1)
+            },
+            "memory": {
+                "total_gb": round(memory_total_gb, 2),
+                "used_gb": round(memory_used_gb, 2),
+                "available_gb": round(memory_available_gb, 2),
+                "percent": round(memory_percent, 1)
+            },
+            "disk": {
+                "total_gb": round(disk_total_gb, 2),
+                "used_gb": round(disk_used_gb, 2),
+                "free_gb": round(disk_free_gb, 2),
+                "percent": round(disk_percent, 1)
+            }
+        }
+    except Exception as e:
+        return {
+            "cpu": {"percent": 0, "count": 0, "available": 100},
+            "memory": {"total_gb": 0, "used_gb": 0, "available_gb": 0, "percent": 0},
+            "disk": {"total_gb": 0, "used_gb": 0, "free_gb": 0, "percent": 0},
+            "error": str(e)
+        }
 
 
 @app.post("/api/vision")
