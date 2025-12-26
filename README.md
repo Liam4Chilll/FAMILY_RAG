@@ -204,7 +204,7 @@ Ouvrez **http://localhost:8000** 🎉
 | Guide | Description |
 |-------|-------------|
 | [Administration](/MANAGE.md) | Gestion, diagnostic et maintenance |
-| [Changelog](CHANGELOG.md) | Historique complet des versions |
+| [Changelog](https://github.com/Liam4Chilll/FAMILY_RAG/releases) | Historique complet des versions |
 
 ---
 
