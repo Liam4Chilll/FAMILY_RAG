@@ -131,6 +131,43 @@
 
         [x-cloak] { display: none !important; }
 
+        /* === NOTIFICATIONS TOAST === */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 9999;
+            pointer-events: all;
+        }
+        .toast-enter {
+            animation: slideInRight 0.3s ease-out;
+        }
+        .toast-leave {
+            animation: slideOutRight 0.3s ease-in;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
         /* === COMPACT LAYOUT === */
         .compact-padding { padding: 0.75rem; }
         .compact-gap { gap: 0.5rem; }
@@ -267,7 +304,7 @@
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold text-accent">Family RAG</h1>
-                            <p class="text-muted text-sm">v2.6.2</p>
+                            <p class="text-muted text-sm">v2.7.0</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -459,6 +496,24 @@
                         </div>
                     </div>
 
+                    <!-- Barre de progression -->
+                    <div x-show="indexing" x-transition class="bg-card/50 backdrop-blur rounded-lg compact-padding border border-themed mb-4 animate-fadeIn">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-muted">Indexation en cours...</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-accent font-medium" x-text="indexProgress + '%'"></span>
+                                <button @click="cancelIndexing()" class="text-xs bg-red-600 hover:bg-red-500 px-2 py-1 rounded transition-all flex items-center gap-1">
+                                    <span>⏸</span> Suspendre
+                                </button>
+                            </div>
+                        </div>
+                        <div class="w-full bg-elevated rounded-full h-2 overflow-hidden">
+                            <div class="h-full gradient-accent transition-all duration-300 ease-out" :style="'width: ' + indexProgress + '%'"></div>
+                        </div>
+                        <p class="text-xs text-muted mt-2 opacity-70" x-text="indexStatus"></p>
+                        <p x-show="indexProgress >= 90" class="text-xs text-orange-300 mt-2 opacity-90">💡 L'indexation peut prendre du temps pour les gros fichiers (génération d'embeddings)...</p>
+                    </div>
+
                     <!-- Stats -->
                     <div class="grid grid-cols-3 gap-3 mb-4">
                         <div class="bg-elevated rounded-lg compact-padding text-center border border-themed hover-lift">
@@ -475,22 +530,122 @@
                         </div>
                     </div>
 
+                    <!-- Métriques système -->
+                    <div class="bg-gradient-to-br from-card/80 to-elevated/80 backdrop-blur rounded-lg compact-padding border border-themed mb-4 animate-fadeIn">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold flex items-center gap-2">
+                                <span class="text-base">💻</span> Métriques système
+                            </h3>
+                            <span class="text-xs text-muted" x-text="'Mise à jour : ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit', second: '2-digit'})"></span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <!-- CPU -->
+                            <div class="bg-elevated/50 rounded-lg p-2 border border-themed/50">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs text-muted">CPU</span>
+                                    <span class="text-xs font-bold text-accent" x-text="systemMetrics.cpu.percent + '%'"></span>
+                                </div>
+                                <div class="w-full bg-card rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-full transition-all duration-500" :class="systemMetrics.cpu.percent > 80 ? 'bg-red-500' : systemMetrics.cpu.percent > 50 ? 'bg-orange-500' : 'bg-green-500'" :style="'width: ' + systemMetrics.cpu.percent + '%'"></div>
+                                </div>
+                                <p class="text-xs text-muted mt-1 opacity-70" x-text="systemMetrics.cpu.count + ' cœurs'"></p>
+                            </div>
+                            <!-- RAM -->
+                            <div class="bg-elevated/50 rounded-lg p-2 border border-themed/50">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs text-muted">RAM</span>
+                                    <span class="text-xs font-bold text-accent" x-text="systemMetrics.memory.percent + '%'"></span>
+                                </div>
+                                <div class="w-full bg-card rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-full transition-all duration-500" :class="systemMetrics.memory.percent > 80 ? 'bg-red-500' : systemMetrics.memory.percent > 50 ? 'bg-orange-500' : 'bg-green-500'" :style="'width: ' + systemMetrics.memory.percent + '%'"></div>
+                                </div>
+                                <p class="text-xs text-muted mt-1 opacity-70" x-text="systemMetrics.memory.available_gb + ' Go libre'"></p>
+                            </div>
+                            <!-- Disque -->
+                            <div class="bg-elevated/50 rounded-lg p-2 border border-themed/50">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs text-muted">Disque</span>
+                                    <span class="text-xs font-bold text-accent" x-text="systemMetrics.disk.percent + '%'"></span>
+                                </div>
+                                <div class="w-full bg-card rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-full transition-all duration-500" :class="systemMetrics.disk.percent > 80 ? 'bg-red-500' : systemMetrics.disk.percent > 50 ? 'bg-orange-500' : 'bg-green-500'" :style="'width: ' + systemMetrics.disk.percent + '%'"></div>
+                                </div>
+                                <p class="text-xs text-muted mt-1 opacity-70" x-text="systemMetrics.disk.free_gb + ' Go libre'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAISS Index Details -->
+                    <div class="bg-gradient-to-br from-card/80 to-elevated/80 backdrop-blur rounded-lg compact-padding border border-themed mb-4 animate-fadeIn">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold flex items-center gap-2">
+                                <span class="text-base">🗂️</span> État de l'index FAISS
+                            </h3>
+                            <button @click="fetchIndexDetails()" class="text-xs text-accent hover:underline flex items-center gap-1">
+                                <span :class="{'animate-spin': fetchingIndexDetails}">🔄</span> Actualiser
+                            </button>
+                        </div>
+                        <div x-show="indexDetails.exists" class="space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-muted">Vecteurs totaux</span>
+                                <span class="text-accent font-bold" x-text="indexDetails.total_vectors || 0"></span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-muted">Fichiers indexés</span>
+                                <span class="text-accent font-bold" x-text="(indexDetails.indexed_files || []).length"></span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-muted">Modèle embedding</span>
+                                <span class="text-accent font-mono text-xs" x-text="indexDetails.embedding_model || 'N/A'"></span>
+                            </div>
+                            <!-- Liste des fichiers indexés (collapsible) -->
+                            <details class="mt-2">
+                                <summary class="text-xs text-muted cursor-pointer hover:text-accent transition-colors">Voir les fichiers indexés</summary>
+                                <div class="mt-2 space-y-1 max-h-32 overflow-y-auto">
+                                    <template x-for="fname in (indexDetails.indexed_files || [])" :key="fname">
+                                        <div class="text-xs bg-elevated/50 px-2 py-1 rounded truncate" x-text="fname"></div>
+                                    </template>
+                                </div>
+                            </details>
+                        </div>
+                        <div x-show="!indexDetails.exists" class="text-xs text-muted text-center py-2">
+                            Aucun index FAISS trouvé. Indexez vos documents pour commencer.
+                        </div>
+                    </div>
+
                     <!-- Index result -->
                     <div x-show="indexResult" x-transition :class="indexResult?.success ? 'bg-green-900/30 border-green-500/50' : 'bg-red-900/30 border-red-500/50'" class="border rounded-lg compact-padding mb-4 animate-fadeIn">
                         <p x-show="indexResult?.success" class="flex items-center gap-2 text-sm">✅ <span x-text="indexResult?.documents"></span> documents, <span x-text="indexResult?.chunks"></span> chunks en <span x-text="indexResult?.time_seconds"></span>s</p>
                         <p x-show="indexResult && !indexResult?.success" class="flex items-center gap-2 text-sm">❌ <span x-text="indexResult?.error"></span></p>
                     </div>
 
-                    <!-- Files list -->
+                    <!-- File Selection Controls -->
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold flex items-center gap-2">
+                            <span>📋</span> Sélection des fichiers
+                            <span class="text-xs text-accent" x-text="'(' + selectedFiles.length + '/' + files.length + ')'"></span>
+                        </h3>
+                        <div class="flex gap-2">
+                            <button @click="selectAllFiles()" class="text-xs text-accent hover:underline">Tout sélectionner</button>
+                            <button @click="deselectAllFiles()" class="text-xs text-muted hover:text-white">Tout désélectionner</button>
+                        </div>
+                    </div>
+
+                    <!-- Files list with checkboxes -->
                     <div class="space-y-2">
                         <template x-for="(file, index) in files" :key="file.path">
-                            <div class="flex items-center justify-between bg-elevated rounded-lg compact-padding border border-themed hover:border-accent transition-all animate-slideIn hover-lift" :style="'animation-delay: ' + (index * 0.03) + 's'">
-                                <div class="flex items-center gap-2">
+                            <label class="flex items-center justify-between bg-elevated rounded-lg compact-padding border border-themed hover:border-accent transition-all animate-slideIn hover-lift cursor-pointer" :style="'animation-delay: ' + (index * 0.03) + 's'">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" x-model="selectedFiles" :value="file.path" class="source-checkbox">
                                     <span class="text-base" x-text="getFileIcon(file.type)"></span>
                                     <span class="text-sm" x-text="file.name"></span>
                                 </div>
-                                <span class="text-xs text-muted bg-card px-2 py-1 rounded" x-text="formatSize(file.size)"></span>
-                            </div>
+                                <div class="flex items-center gap-2">
+                                    <!-- Indicateur si indexé -->
+                                    <span x-show="(indexDetails.indexed_files || []).includes(file.name)" class="text-xs text-green-400" title="Déjà indexé">✓</span>
+                                    <span class="text-xs text-muted bg-card px-2 py-1 rounded" x-text="formatSize(file.size)"></span>
+                                </div>
+                            </label>
                         </template>
                         <div x-show="files.length === 0" class="text-center text-muted py-12">
                             <p class="text-sm">Aucun fichier</p>
@@ -527,7 +682,7 @@
                         </h2>
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs text-muted mb-2">Modèle actif</label>
+                                <label class="block text-xs text-muted mb-2">Modèle actif (génération)</label>
                                 <select x-model="selectedModel" @change="changeModel()" :disabled="ollamaModels.length === 0" class="w-full bg-elevated border border-themed rounded-lg compact-padding text-sm focus:outline-none focus:border-accent transition-all" style="color: var(--text-primary)">
                                     <template x-for="model in ollamaModels" :key="model.name">
                                         <option :value="model.name" x-text="model.name"></option>
@@ -535,12 +690,14 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs text-muted mb-2">Température : <span class="text-accent" x-text="settings.temperature"></span></label>
+                                <label class="block text-xs text-muted mb-2">Température (créativité) : <span class="text-accent" x-text="settings.temperature"></span></label>
                                 <input type="range" min="0" max="1" step="0.1" x-model="settings.temperature" @change="updateSettings()" class="w-full">
+                                <p class="text-xs text-muted mt-1 opacity-70">0 = précis, 1 = créatif</p>
                             </div>
                             <div>
-                                <label class="block text-xs text-muted mb-2">Chunks (top_k) : <span class="text-accent" x-text="settings.top_k"></span></label>
-                                <input type="range" min="1" max="10" step="1" x-model="settings.top_k" @change="updateSettings()" class="w-full">
+                                <label class="block text-xs text-muted mb-2">Chunks (contexte) : <span class="text-accent" x-text="settings.top_k"></span></label>
+                                <input type="range" min="1" max="20" step="1" x-model="settings.top_k" @change="updateSettings()" class="w-full">
+                                <p class="text-xs text-muted mt-1 opacity-70">Nombre d'extraits utilisés pour répondre</p>
                             </div>
                         </div>
                     </div>
@@ -553,12 +710,13 @@
                         </h2>
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs text-muted mb-2">Modèle actif</label>
+                                <label class="block text-xs text-muted mb-2">Modèle actif (indexation)</label>
                                 <select x-model="selectedEmbeddingModel" @change="changeEmbeddingModel()" :disabled="embeddingModels.length === 0" class="w-full bg-elevated border border-themed rounded-lg compact-padding text-sm focus:outline-none focus:border-accent transition-all" style="color: var(--text-primary)">
                                     <template x-for="model in embeddingModels" :key="model.name">
                                         <option :value="model.name" x-text="model.name"></option>
                                     </template>
                                 </select>
+                                <p class="text-xs text-muted mt-1 opacity-70">Convertit vos documents en vecteurs pour la recherche</p>
                             </div>
                             <!-- Avertissement ré-indexation -->
                             <div x-show="needsReindex" x-transition class="bg-orange-900/30 border border-orange-500/50 rounded-lg compact-padding animate-fadeIn">
@@ -579,7 +737,7 @@
             </div>
 
             <footer class="mt-8 text-center text-muted text-xs">
-                <p>Family RAG v2.6 — Liam4Chilll</p>
+                <p>Family RAG v2.7 — Liam4Chilll</p>
             </footer>
         </div>
     </div>
@@ -649,7 +807,19 @@
                 abortController: null,
                 indexing: false,
                 indexResult: null,
+                indexProgress: 0,
+                indexStatus: '',
+                indexAbortController: null,
                 files: [],
+                selectedFiles: [],
+                indexDetails: { exists: false, indexed_files: [], total_vectors: 0 },
+                fetchingIndexDetails: false,
+                systemMetrics: {
+                    cpu: { percent: 0, count: 0, available: 100 },
+                    memory: { total_gb: 0, used_gb: 0, available_gb: 0, percent: 0 },
+                    disk: { total_gb: 0, used_gb: 0, free_gb: 0, percent: 0 }
+                },
+                systemMetricsInterval: null,
                 ollamaConnected: false,
                 ollamaModels: [],
                 selectedModel: '',
@@ -687,12 +857,31 @@
                     await this.fetchStats();
                     await this.fetchOllamaModels();
                     await this.fetchEmbeddingModels();
+                    await this.fetchIndexDetails();
                     this.selectedModel = this.stats.settings.llm_model;
                     this.selectedEmbeddingModel = this.stats.settings.embedding_model;
                     this.checkVisionAvailable();
                     this.loadConversations();
                     this.newConversation();
                     setInterval(() => this.checkHealth(), 30000);
+
+                    // Démarrer le polling des métriques système
+                    this.fetchSystemMetrics();
+                    this.systemMetricsInterval = setInterval(() => this.fetchSystemMetrics(), 2000);
+                },
+
+                showNotification(type, title, message, icon = null) {
+                    window.dispatchEvent(new CustomEvent('notify', {
+                        detail: { type, title, message, icon }
+                    }));
+                },
+
+                async fetchSystemMetrics() {
+                    try {
+                        this.systemMetrics = await (await fetch('/api/system/metrics')).json();
+                    } catch (e) {
+                        console.error('Erreur récupération métriques:', e);
+                    }
                 },
 
                 checkVisionAvailable() {
@@ -823,6 +1012,12 @@
                     if (this.loading) return;
                     if (!this.query.trim() && !this.pendingImage) return;
 
+                    // Vérifier qu'un modèle LLM est disponible (vérifier depuis les stats backend)
+                    if (!this.stats.settings.llm_model || this.stats.settings.llm_model === '') {
+                        this.showNotification('error', 'Aucun modèle LLM disponible', 'Veuillez installer un modèle LLM avec "ollama pull <modele>" puis le sélectionner dans les paramètres.', '🤖');
+                        return;
+                    }
+
                     const question = this.query.trim() || "Décris cette image en détail et extrait tout le texte visible.";
                     const hasImage = !!this.pendingImage;
 
@@ -928,6 +1123,26 @@
                     this.refreshingFiles = false;
                 },
 
+                async fetchIndexDetails() {
+                    this.fetchingIndexDetails = true;
+                    try {
+                        const response = await fetch('/api/index/details');
+                        this.indexDetails = await response.json();
+                    } catch (e) {
+                        console.error('Erreur récupération détails index:', e);
+                        this.indexDetails = { exists: false, indexed_files: [], total_vectors: 0 };
+                    }
+                    this.fetchingIndexDetails = false;
+                },
+
+                selectAllFiles() {
+                    this.selectedFiles = this.files.map(f => f.path);
+                },
+
+                deselectAllFiles() {
+                    this.selectedFiles = [];
+                },
+
                 async fetchStats() {
                     try {
                         const d = await (await fetch('/api/stats')).json();
@@ -958,17 +1173,95 @@
                 },
 
                 async indexDocuments() {
-                    this.indexing = true; this.indexResult = null;
+                    // Validation : vérifier qu'au moins un fichier est sélectionné
+                    if (this.selectedFiles.length === 0) {
+                        this.showNotification('warning', 'Aucun fichier sélectionné', 'Veuillez sélectionner au moins un fichier à indexer.', '📋');
+                        return;
+                    }
+
+                    this.indexing = true;
+                    this.indexResult = null;
+                    this.indexProgress = 0;
+                    this.indexStatus = `Indexation de ${this.selectedFiles.length} fichier(s)...`;
+
+                    // Créer un AbortController pour permettre l'annulation
+                    this.indexAbortController = new AbortController();
+
+                    // Simuler la progression (l'API ne retourne pas de progression en temps réel)
+                    const progressInterval = setInterval(() => {
+                        if (this.indexProgress < 95) {
+                            // Progression rapide jusqu'à 90%, puis très lente après
+                            if (this.indexProgress < 90) {
+                                this.indexProgress += Math.random() * 10;
+                                if (this.indexProgress > 90) this.indexProgress = 90;
+                            } else {
+                                // Après 90%, progression très lente pour montrer que ça travaille
+                                this.indexProgress += Math.random() * 0.5;
+                                if (this.indexProgress > 95) this.indexProgress = 95;
+                            }
+
+                            // Mettre à jour le statut en fonction de la progression
+                            if (this.indexProgress < 30) {
+                                this.indexStatus = 'Chargement des documents...';
+                            } else if (this.indexProgress < 60) {
+                                this.indexStatus = 'Découpage en chunks...';
+                            } else if (this.indexProgress < 90) {
+                                this.indexStatus = 'Création des embeddings...';
+                            } else {
+                                this.indexStatus = 'Finalisation de l\'index FAISS...';
+                            }
+                        }
+                    }, 300);
+
                     try {
-                        const r = await fetch('/api/index', { method: 'POST' });
+                        // Envoyer les fichiers sélectionnés au backend
+                        const requestBody = this.selectedFiles.length === this.files.length
+                            ? {}
+                            : { selected_files: this.selectedFiles };
+
+                        const r = await fetch('/api/index', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(requestBody),
+                            signal: this.indexAbortController.signal
+                        });
                         this.indexResult = await r.json();
-                        if (r.ok) {
+
+                        clearInterval(progressInterval);
+                        this.indexProgress = 100;
+                        this.indexStatus = 'Indexation terminée !';
+
+                        if (this.indexResult.success) {
                             await this.fetchStats();
+                            await this.fetchIndexDetails();
                             // Masquer l'avertissement de ré-indexation après indexation réussie
                             this.needsReindex = false;
+                            this.showNotification('success', 'Indexation réussie', `${this.indexResult.documents} documents indexés en ${this.indexResult.chunks} chunks`, '✅');
+                        } else {
+                            this.showNotification('error', 'Erreur d\'indexation', this.indexResult.error || 'Une erreur est survenue', '❌');
                         }
-                    } catch (e) { this.indexResult = { success: false, error: e.message }; }
+                    } catch (e) {
+                        clearInterval(progressInterval);
+                        if (e.name === 'AbortError') {
+                            this.indexResult = { success: false, error: 'Indexation suspendue par l\'utilisateur' };
+                            this.showNotification('warning', 'Indexation suspendue', 'L\'indexation a été interrompue', '⏸');
+                        } else {
+                            this.indexResult = { success: false, error: e.message };
+                            this.showNotification('error', 'Erreur d\'indexation', e.message, '❌');
+                        }
+                    }
+
+                    // Attendre un peu avant de masquer la barre de progression
+                    await new Promise(resolve => setTimeout(resolve, 800));
                     this.indexing = false;
+                    this.indexAbortController = null;
+                },
+
+                cancelIndexing() {
+                    if (this.indexAbortController) {
+                        this.indexAbortController.abort();
+                        this.indexStatus = 'Suspension en cours...';
+                    }
                 },
 
                 async updateSettings() {
@@ -1017,5 +1310,30 @@
             };
         }
     </script>
+
+    <!-- Notifications Toast -->
+    <div class="toast" x-data="{ notifications: [] }" @notify.window="notifications.push($event.detail); setTimeout(() => notifications.shift(), 5000)">
+        <template x-for="(notif, index) in notifications" :key="index">
+            <div x-show="true" x-transition:enter="toast-enter" x-transition:leave="toast-leave"
+                 class="mb-2 rounded-lg shadow-2xl overflow-hidden border-2 animate-pulse-border"
+                 :class="{
+                     'bg-red-900/95 border-red-500': notif.type === 'error',
+                     'bg-orange-900/95 border-orange-500': notif.type === 'warning',
+                     'bg-green-900/95 border-green-500': notif.type === 'success',
+                     'bg-blue-900/95 border-blue-500': notif.type === 'info'
+                 }">
+                <div class="p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" x-text="notif.icon || (notif.type === 'error' ? '❌' : notif.type === 'warning' ? '⚠️' : notif.type === 'success' ? '✅' : 'ℹ️')"></span>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm mb-1" x-text="notif.title"></h4>
+                            <p class="text-xs opacity-90" x-text="notif.message"></p>
+                        </div>
+                        <button @click="notifications.splice(index, 1)" class="text-white/70 hover:text-white transition-colors">✕</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
 </body>
 </html>
