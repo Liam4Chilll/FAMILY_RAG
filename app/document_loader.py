@@ -211,6 +211,69 @@ class DocumentLoader:
                 print(f"[Loader] {loaded.filename} → type:{doc_type}, année:{doc_year}, auteur:{doc_author or 'N/A'}")
 
         return documents
+
+    def load_specific(self, file_paths: List[str]) -> List[Document]:
+        """Charge uniquement les fichiers spécifiés.
+
+        Args:
+            file_paths: Liste des chemins relatifs des fichiers à charger
+
+        Returns:
+            Liste de Documents Langchain
+        """
+        documents = []
+
+        for relative_path in file_paths:
+            file_path = self.data_dir / relative_path
+
+            if not file_path.exists():
+                print(f"[Loader] ⚠️ Fichier introuvable : {relative_path}")
+                continue
+
+            if not file_path.is_file():
+                continue
+
+            if file_path.suffix.lower() not in self.SUPPORTED_EXTENSIONS:
+                print(f"[Loader] ⚠️ Extension non supportée : {relative_path}")
+                continue
+
+            # Charger le fichier
+            loaded = self._load_file(file_path)
+
+            if loaded.error:
+                print(f"[Loader] ❌ Erreur chargement {loaded.filename}: {loaded.error}")
+            elif loaded.content:
+                # Extraire métadonnées enrichies
+                doc_date = self._extract_date(loaded.content, file_path)
+                doc_year = self._extract_year(file_path, loaded.content)
+                doc_type = self._classify_document(loaded.content)
+                doc_author = self._extract_author(loaded.content)
+
+                # Créer le document avec métadonnées complètes
+                metadata = {
+                    'source': loaded.filename,
+                    'file_type': loaded.file_type,
+                    'size_bytes': loaded.size_bytes,
+                    'date': doc_date,
+                    'year': doc_year,
+                    'doc_type': doc_type,
+                    'author': doc_author
+                }
+
+                # Supprimer les None pour alléger
+                metadata = {k: v for k, v in metadata.items() if v is not None}
+
+                doc = Document(
+                    page_content=loaded.content,
+                    metadata=metadata
+                )
+                documents.append(doc)
+
+                # Log des métadonnées extraites
+                print(f"[Loader] {loaded.filename} → type:{doc_type}, année:{doc_year}, auteur:{doc_author or 'N/A'}")
+
+        print(f"[Loader] {len(documents)}/{len(file_paths)} fichiers chargés avec succès")
+        return documents
     
     def _load_file(self, file_path: Path) -> LoadedDocument:
         """Charge un fichier selon son extension."""

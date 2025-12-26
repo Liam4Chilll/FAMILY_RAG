@@ -98,14 +98,23 @@ class RAGEngine:
         """Charge l'index FAISS depuis le disque."""
         if self.index_path.exists():
             try:
+                print(f"[Family RAG] Chargement de l'index depuis {self.index_path}...")
                 self.vectorstore = FAISS.load_local(
                     str(self.index_path),
                     self.embeddings,
                     allow_dangerous_deserialization=True
                 )
+                print(f"[Family RAG] Index chargé avec succès")
                 return True
             except Exception as e:
-                print(f"Erreur chargement index: {e}")
+                print(f"[Family RAG] Erreur chargement index: {e}")
+                print(f"[Family RAG] Suppression de l'index corrompu...")
+                try:
+                    import shutil
+                    shutil.rmtree(str(self.index_path))
+                    print(f"[Family RAG] Index corrompu supprimé. Veuillez ré-indexer vos documents.")
+                except Exception as cleanup_error:
+                    print(f"[Family RAG] Impossible de supprimer l'index corrompu: {cleanup_error}")
         return False
     
     def _save_index(self):
@@ -114,12 +123,22 @@ class RAGEngine:
             self.index_path.parent.mkdir(parents=True, exist_ok=True)
             self.vectorstore.save_local(str(self.index_path))
     
-    def index_documents(self) -> dict:
-        """Indexe tous les documents du dossier data."""
+    def index_documents(self, selected_files: list = None) -> dict:
+        """Indexe les documents sélectionnés ou tous les documents.
+
+        Args:
+            selected_files: Liste des chemins de fichiers à indexer (None = tous)
+        """
         start_time = time.time()
-        
-        # Charger les documents
-        documents = self.doc_loader.load_all()
+
+        # Charger les documents (tous ou sélectionnés)
+        if selected_files:
+            print(f"[Family RAG] Indexation sélective de {len(selected_files)} fichiers")
+            documents = self.doc_loader.load_specific(selected_files)
+        else:
+            print(f"[Family RAG] Indexation de tous les documents")
+            documents = self.doc_loader.load_all()
+
         if not documents:
             return {
                 'success': False,
@@ -197,9 +216,38 @@ class RAGEngine:
             'success': True,
             'documents': len(documents),
             'chunks': len(chunks),
-            'time_seconds': round(elapsed, 2)
+            'time_seconds': round(elapsed, 2),
+            'indexed_files': [doc.metadata.get('source', 'unknown') for doc in documents]
         }
-    
+
+    def get_index_details(self) -> dict:
+        """Retourne les détails complets de l'index FAISS."""
+        if not self.vectorstore:
+            return {
+                'exists': False,
+                'total_vectors': 0,
+                'indexed_files': [],
+                'index_path': str(self.index_path)
+            }
+
+        # Compter les vecteurs dans l'index
+        total_vectors = self.vectorstore.index.ntotal if hasattr(self.vectorstore, 'index') else 0
+
+        # Extraire la liste des fichiers indexés depuis les métadonnées
+        indexed_files = set()
+        if hasattr(self.vectorstore, 'docstore') and hasattr(self.vectorstore.docstore, '_dict'):
+            for doc in self.vectorstore.docstore._dict.values():
+                if hasattr(doc, 'metadata') and 'source' in doc.metadata:
+                    indexed_files.add(doc.metadata['source'])
+
+        return {
+            'exists': True,
+            'total_vectors': total_vectors,
+            'indexed_files': sorted(list(indexed_files)),
+            'index_path': str(self.index_path),
+            'embedding_model': self.settings.embedding_model
+        }
+
     def _rerank_chunks(self, question: str, docs_with_scores: List, target_k: int) -> List:
         """Re-classe les chunks avec le LLM pour améliorer la pertinence sémantique.
 
