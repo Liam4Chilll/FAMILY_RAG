@@ -24,6 +24,11 @@ COPY app/ .
 # Créer les dossiers nécessaires
 RUN mkdir -p /data /app/index /app/static /app/templates
 
+# Rendre le script d'entrée exécutable
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 8000
 
+# Utiliser l'entrypoint pour la détection automatique d'Ollama
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
