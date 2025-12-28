@@ -206,7 +206,7 @@ Ouvrez **http://localhost:8000** 🎉
 
 | Guide | Description |
 |-------|-------------|
-| [Administration](docs/MANAGE.md) | Gestion, diagnostic et maintenance |
+| [Administration](https://github.com/Liam4Chilll/FAMILY_RAG/blob/main/MANAGE.md) | Gestion, diagnostic et maintenance |
 | [Changelog](CHANGELOG.md) | Historique complet des versions |
 
 ---
